@@ -1,14 +1,7 @@
 import pandas as pd
 import Student 
 from queue import PriorityQueue as pq
-
 class CourseSection:
-    #condider this: using only the priority queue of students to track the roster
-    #and instead of searching a student to force remove use a hash table to track previously removed students
-    #and cross check it in an indefinite loop when a student is popped from the table, this won't impact
-    #time complexity. Entry set can be used maybe for printing and stuff
-    
-    #actually just let this be, force remove can be worried about later this is totally fine
     
     def __init__(self, id: int, course_name: str, capacity: int, credits: int):
         self.id = id # 6 digit CRN
