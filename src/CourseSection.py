@@ -10,6 +10,7 @@ class CourseSection:
         self.course_name = course_name
         self.roster_pq = pq() # sorted by section score
         self.number_enrolled = 0
+        self.swapped_out = (False, 0) # this lets the algorithm know if a student was swapped out and which student
         removed_students_ids = {}
         
     def __str__(self):

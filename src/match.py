@@ -5,10 +5,10 @@ from CourseSection import CourseSection
 """
 TODO
 - complete data methods for frame to dictionary to objects and vice versa
-- find a way to add the removed student back to the free students list when they get replaced
 - create a refresh preferenfes method for students that puts the courses that fit into credits on top, 
   will eventually handle backups etc
-- test Gale-Shapley method for stabiliy, create more individualized test files/cases
+- test Gale-Shapley method for functionality and stabiliy, create more individualized test files/cases
+  this will require a far more comprehensive printing/testing method, could be high priority
 - add comments and documentation where needed
 """
 
@@ -54,6 +54,7 @@ def add_student_to_section(student: Student, section: CourseSection):
 
 def try_enrolling(student: Student, section: CourseSection):
         # print("running try enrolling")
+        section.swapped_out = (False, 0)
         if student.credits_enrolled + section.credits > student.credit_limit: # this is maybe redundant with  new is free method?
             print(f'student #{student.id} could not enroll in section #{section.id}'
                   +' because they are taking too many credits')
@@ -61,6 +62,7 @@ def try_enrolling(student: Student, section: CourseSection):
         elif section.is_full():
             if section.score_student(student) > section.student_score_pq[0]:
                 removed_student = section.pop_lowest_student() # currently does nothing, try new addition to removed dict?
+                section.swapped_out = (True, removed_student.id)
                 return add_student_to_section(student, section)
             else:
                 print(f'student #{student.id} could not enroll in section #{section.id}'
@@ -75,8 +77,6 @@ def try_enrolling_next_section(student: Student):
     return try_enrolling(student, top_section)
         
 def Gale_Shapley():
-    # just needs logic for students kicked out of sections, and handling for students who want lower credits courses
-    # but dont have space for more credit courses before them
     free_students = []
     for id in student_dict:
         free_students.append(id)
@@ -88,6 +88,12 @@ def Gale_Shapley():
             cur_student_new, proposed_section_new = try_enrolling_next_section(cur_student)
             student_dict[cur_student.id] = cur_student_new
             section_dict[proposed_section_new.id] = proposed_section_new
+            if proposed_section_new.swapped_out[0] == True:
+                swapped_student = student_dict[proposed_section_new.swapped_out[1]]
+                swapped_student.leave_section(proposed_section_new)
+                student_dict[swapped_student.id] = swapped_student
+                free_students.append(swapped_student.id)
+                break
             cur_student = cur_student_new
         free_students.pop()
 

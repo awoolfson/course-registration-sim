@@ -31,6 +31,12 @@ class Student:
         self.credits_enrolled += section.credits
         self.schedule.append(section.id)
         
+    def leave_section(self, section: CourseSection):
+        # this can be optimized to dictionary later, just too lazy right now
+        if section.id in self.schedule:
+            self.schedule.remove(section.id)
+            self.credits_enrolled -= section.credits
+        
     def get_top_section_id(self):
         return self.section_ranking[self.next_section_index]
     
