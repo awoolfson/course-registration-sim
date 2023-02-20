@@ -2,9 +2,15 @@ import pandas as pd
 from Student import Student
 from CourseSection import CourseSection
 
-#student aren't getting section rankings for some reason, also handle the possiblity that they might not have 
-# a ranking anyway in the gale shapely method
-# something like while they have a next section - if they have space for that section
+"""
+TODO
+- complete data methods for frame to dictionary to objects and vice versa
+- find a way to add the removed student back to the free students list when they get replaced
+- create a refresh preferenfes method for students that puts the courses that fit into credits on top, 
+  will eventually handle backups etc
+- test Gale-Shapley method for stabiliy, create more individualized test files/cases
+- add comments and documentation where needed
+"""
 
 section_df = pd.DataFrame() # dataframe serves as intemediary between CSV and dict
 section_dict = {} # source of truth during program
