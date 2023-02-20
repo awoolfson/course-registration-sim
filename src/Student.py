@@ -11,9 +11,10 @@ class Student:
         self.schedule = []
         self.credits_enrolled = 0
         self.section_score = None # compare students within a section, should not be saved to a database ever
+        self.next_section_index = 0
         
     def __str__(self):
-        return f'{self.name}:\n id: {self.id}\n base_score: {self.base_score}\n'
+        return f'{self.name}:\n id: {self.id}\n base_score: {self.base_score}\n section ranking: {self.section_ranking}\n schedule: {self.schedule}\n credits enrolled: {self.credits_enrolled }'
     
     def __lt__(self, other_student):
         return self.section_score < other_student.section_score
@@ -29,3 +30,18 @@ class Student:
     def join_section(self, section: CourseSection):
         self.credits_enrolled += section.credits
         self.schedule.append(section.id)
+        
+    def get_top_section_id(self):
+        return self.section_ranking[self.next_section_index]
+    
+    def increment_next_section(self):
+        self.next_section_index += 1
+        
+    def has_credits_to_fill(self, credits: int):
+        has_credits = self.credit_limit - self.credits_enrolled >= credits
+        return has_credits
+
+    def is_finished_proposing(self):
+        return self.next_section_index >= len(self.section_ranking)
+        
+        

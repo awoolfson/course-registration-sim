@@ -13,7 +13,10 @@ class CourseSection:
         removed_students_ids = {}
         
     def __str__(self):
-        return f'{self.course_name}:\n id: {self.id}\n capacity: {self.capacity}\n credits: {self.credits}\n'
+        roster = self.roster_pq.queue
+        for i, s in enumerate(roster):
+            roster[i] = s.id
+        return f'{self.course_name}:\n id: {self.id}\n capacity: {self.capacity}\n credits: {self.credits}\n' + f'roster: {roster}\n'
     
     def score_student(self, student: Student):
         return student.base_score
