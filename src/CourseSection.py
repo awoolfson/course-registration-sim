@@ -31,10 +31,7 @@ class CourseSection:
         return popped_student
     
     def is_full(self):
-        if self.roster_pq.qsize() >= self.capacity:
-            return True
-        else:
-            return False
+        return self.roster_pq.qsize() >= self.capacity
     
     def enroll(self, student: Student):
         student.section_score = self.score_student(student)

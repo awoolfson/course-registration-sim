@@ -1,4 +1,4 @@
-id,course_name,capacity,credits,roster_ids,removed_students_ids
+id,course_name,capacity,credits,roster_ids,
 100000,"COM110",5,4,,
 200000,"ECO212",5,4,,
 300000,"PHE101",5,2,,
