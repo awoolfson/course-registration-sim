@@ -53,6 +53,10 @@ def add_student_to_section(student: Student, section: CourseSection):
     return student, section
 
 def try_enrolling(student: Student, section: CourseSection):
+    
+    # checks if a student has enough credits, if course has space or student is better than current enrolled
+    # returns updated objects
+    
         # print("running try enrolling")
         section.swapped_out = (False, 0)
         if student.credits_enrolled + section.credits > student.credit_limit: # this is maybe redundant with  new is free method?
@@ -72,30 +76,60 @@ def try_enrolling(student: Student, section: CourseSection):
             return add_student_to_section(student, section)
         
 def try_enrolling_next_section(student: Student):
-    top_section = section_dict[student.get_top_section_id()]
+    
+    # handles student top section pointer and calls try_enrolling
+    
+    proposed_section = section_dict[student.get_top_section_id()]
     student.increment_next_section()
-    return try_enrolling(student, top_section)
+    return try_enrolling(student, proposed_section)
         
 def Gale_Shapley():
+    
+    # initialize and populate free students list
+    
     free_students = []
     for id in student_dict:
         free_students.append(id)
+        
+    # look at last student in free list
+    
     while len(free_students) > 0:
         cur_student = student_dict[free_students[-1]]
+        
+        # while student has more sections to propose to
+        
         while not cur_student.is_finished_proposing():
+            
+            # if they have no more credits they can fulfill
+            
             if not cur_student.has_credits_to_fill(section_dict[cur_student.get_top_section_id()].credits):
                 break
+            
+            # try enrolling student in favorite section
+            
             cur_student_new, proposed_section_new = try_enrolling_next_section(cur_student)
+            
+            # update dictionaries with returned student and section objects
+            
             student_dict[cur_student.id] = cur_student_new
             section_dict[proposed_section_new.id] = proposed_section_new
+            
+            # if a student in the section has been replaced
+            
             if proposed_section_new.swapped_out[0] == True:
                 swapped_student = student_dict[proposed_section_new.swapped_out[1]]
                 swapped_student.leave_section(proposed_section_new)
                 student_dict[swapped_student.id] = swapped_student
-                free_students.append(swapped_student.id)
-                break
+                free_students.append(swapped_student.id) # it should be fine anyway if this is duplicate?
+                break # break so the swapped student can start proposing
+            
+            # update the student object for the loop
+            
             cur_student = cur_student_new
         free_students.pop()
+        
+def is_stable():
+    pass
 
 def main():
     global student_dict
