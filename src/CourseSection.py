@@ -1,6 +1,7 @@
 import pandas as pd
 import Student 
 from queue import PriorityQueue as pq
+import heapq
 class CourseSection:
     
     def __init__(self, id: int, course_name: str, capacity: int, credits: int):
@@ -8,32 +9,35 @@ class CourseSection:
         self.capacity = capacity
         self.credits = credits
         self.course_name = course_name
-        self.roster_pq = pq() # sorted by section score
+        self.roster_pq = [] # sorted by section score
         self.number_enrolled = 0
         self.swapped_out = (False, 0) # this lets the algorithm know if a student was swapped out and which student
-        removed_students_ids = {}
+        self.student_section_scores = {}
         
     def __str__(self):
-        roster = self.roster_pq.queue
-        for i, s in enumerate(roster):
-            roster[i] = s.id
-        return f'{self.course_name}:\n id: {self.id}\n capacity: {self.capacity}\n credits: {self.credits}\n' + f'roster: {roster}\n'
+        return f'{self.course_name}:\n id: {self.id}\n capacity: {self.capacity}\n credits: {self.credits}\n' + f'roster: {self.roster_pq}\n'
     
     def score_student(self, student: Student):
-        return student.base_score
+        id = student.id
+        if id in self.student_section_scores:
+            return self.student_section_scores[id]
+        else:
+            # subject to change once scoring function is done
+            self.student_section_scores[id] = student.base_score
+            return student.base_score
     
     def pop_lowest_student(self):
-        # nessecary so hash table can be used for validation of students
-        popped_student = self.roster_pq.pop()
-        self.removed_students[popped_student.id] = popped_student
-        while self.roster_pq[0].id in self.removed_students:
-            self.roster_pq.get()
+        popped_student = heapq.heappop(self.roster_pq)
         return popped_student
     
+    def return_lowest_student(self):
+        lowest_student = heapq.heappop(self.roster_pq)
+        heapq.heappush(self.roster_pq, lowest_student)
+        return lowest_student
+    
     def is_full(self):
-        return self.roster_pq.qsize() >= self.capacity
+        return len(self.roster_pq) >= self.capacity
     
     def enroll(self, student: Student):
         student.section_score = self.score_student(student)
-        self.roster_pq.put(student)
-        
+        heapq.heappush(self.roster_pq, student)

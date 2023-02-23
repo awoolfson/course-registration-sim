@@ -8,7 +8,7 @@ TODO
   will eventually handle backups etc
 - test Gale-Shapley method for functionality and stabiliy, create more individualized test files/cases
   this will require a far more comprehensive printing/testing method, could be high priority
-- add comments and documentation where needed
+  - add the stability tester method
 """
 
 section_df = pd.DataFrame() # dataframe serves as intemediary between CSV and dict
@@ -45,7 +45,7 @@ def update_student_df(student: Student):
 def update_section_df(section: CourseSection):
     # currently only updates roster, will need to update removed if I end up using it
     roster = []
-    for student in section.roster_pq.queue:
+    for student in section.roster_pq:
         roster.append(student.id)
     section_df.at[section.id, 'roster_ids'] = str(roster)[1:-1]
 
@@ -65,9 +65,10 @@ def try_enrolling(student: Student, section: CourseSection):
                   +' because they are taking too many credits')
             return student, section
         elif section.is_full():
-            if section.score_student(student) > section.roster_pq.queue[0].section_score:
+            if section.score_student(student) > section.return_lowest_student().section_score:
                 removed_student = section.pop_lowest_student() # currently does nothing, try new addition to removed dict?
                 section.swapped_out = (True, removed_student.id)
+                print(f'student:\n {removed_student}\n swapped out for\n {student}\n in section:\n {section}')
                 return add_student_to_section(student, section)
             else:
                 print(f'student #{student.id} could not enroll in section #{section.id}'
@@ -81,6 +82,7 @@ def try_enrolling_next_section(student: Student):
     # handles student top section pointer and calls try_enrolling
     
     proposed_section = section_dict[student.get_top_section_id()]
+    print(f"trying to enroll {student.name} in {proposed_section.course_name}")
     student.increment_next_section()
     return try_enrolling(student, proposed_section)
         
@@ -95,7 +97,9 @@ def Gale_Shapley():
     # look at last student in free list
     
     while len(free_students) > 0:
+        to_pop = True # this determines if a student has been swapped out and a pop on the free student list is not needed
         cur_student = student_dict[free_students[-1]]
+        print(f"cur_student: {cur_student.name}\n")
         
         # while student has more sections to propose to
         
@@ -104,33 +108,61 @@ def Gale_Shapley():
             # if they have no more credits they can fulfill
             
             if not cur_student.has_credits_to_fill(section_dict[cur_student.get_top_section_id()].credits):
+                print(f"all credits fulfilled!\n")
                 break
             
             # try enrolling student in favorite section
             
-            cur_student_new, proposed_section_new = try_enrolling_next_section(cur_student)
+            updated_agents = try_enrolling_next_section(cur_student)
+            cur_student_new, proposed_section_new = updated_agents[0], updated_agents[1]
             
             # update dictionaries with returned student and section objects
             
             student_dict[cur_student.id] = cur_student_new
             section_dict[proposed_section_new.id] = proposed_section_new
             
+            print(f"cur_student_new:\n\n {cur_student_new}\n\n proposed_section_new:\n\n {proposed_section_new}")
+            
             # if a student in the section has been replaced
             
             if proposed_section_new.swapped_out[0] == True:
+                to_pop = False
                 swapped_student = student_dict[proposed_section_new.swapped_out[1]]
                 swapped_student.leave_section(proposed_section_new)
                 student_dict[swapped_student.id] = swapped_student
                 free_students.append(swapped_student.id) # it should be fine anyway if this is duplicate?
+                cur_student = cur_student_new
                 break # break so the swapped student can start proposing
             
-            # update the student object for the loop
+            print(f"proposed_section_new queue:\n\n {proposed_section_new.roster_pq}")
             
-            cur_student = cur_student_new
-        free_students.pop()
+            # update the student object for the loop
+        if to_pop:
+            free_students.pop()
         
-def is_stable():
-    pass
+def is_pairwise_stable():
+    
+    # to be tested
+    
+    for key in student_dict:
+        cur_student = student_dict[key]
+
+        cur_student_remaining_schedule = cur_student.schedule # used to check if iteration has passed the lowest ranked course in schedule
+        
+        for index, section_id in enumerate(cur_student.section_ranking):
+            
+            if not section_id in cur_student.schedule:
+                if not section_dict[section_id].is_full():
+                    return False
+                else:
+                    # ok this is very ugly, fix this and make a variable for cur_section
+                    if section_dict[section_id].return_lowest_student().section_score < section_dict[section_id].score_student(cur_student):
+                        return False
+            else:
+                cur_student_remaining_schedule.remove(section_id)
+                if len(cur_student_remaining_schedule) == 0:
+                    continue # move on to next student if all prefered sections have been examined
+        return True
 
 def main():
     global student_dict

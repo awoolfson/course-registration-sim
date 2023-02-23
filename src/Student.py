@@ -18,9 +18,15 @@ class Student:
     
     def __lt__(self, other_student):
         return self.section_score < other_student.section_score
+     
+    def __eq__(self, other_student):
+        return self.section_score == other_student.section_score
+    
+    def __gt__(self, other_student):
+        return self.section_score > other_student.section_score
         
     def insert_section_preference(self, index: int, section: CourseSection):
-        self.section_preferences_ordered.insert(index, section)
+        self.section_ranking.insert(index, section)
             
     def set_section_ranking(self, ranking: list):
         for i, section_id in enumerate(ranking):
