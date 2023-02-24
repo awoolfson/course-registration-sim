@@ -15,7 +15,10 @@ class CourseSection:
         self.student_section_scores = {}
         
     def __str__(self):
-        return f'{self.course_name}:\n id: {self.id}\n capacity: {self.capacity}\n credits: {self.credits}\n' + f'roster: {self.roster_pq}\n'
+        roster = []
+        for s in self.roster_pq:
+            roster.append(s.id)
+        return f'{self.course_name}:\n id: {self.id}\n capacity: {self.capacity}\n credits: {self.credits}\n' + f'roster: {roster}'
     
     def score_student(self, student: Student):
         id = student.id
