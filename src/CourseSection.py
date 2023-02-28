@@ -1,6 +1,5 @@
 import pandas as pd
 import Student 
-from queue import PriorityQueue as pq
 import heapq
 class CourseSection:
     

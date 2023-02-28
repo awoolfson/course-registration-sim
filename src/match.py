@@ -4,9 +4,13 @@ from CourseSection import CourseSection
 
 """
 TODO
+- random test input generation file
+- seperate testing file, (and data i/o file)?
+- make sure test stability works
 - create a refresh preferences method for students that puts the courses that fit into credits on top, 
   will eventually handle backups etc
-- pairwise stable testing method
+- account for credits issue
+- test for efficiency / calculate time complexity
 """
 
 section_df = pd.DataFrame() # dataframe serves as intemediary between CSV and dict
@@ -137,6 +141,8 @@ def Gale_Shapley():
             # update the student object for the loop
         if to_pop:
             free_students.pop()
+            
+        print(free_students)
         
 def is_pairwise_stable():
     
@@ -201,14 +207,14 @@ def main():
     Gale_Shapley()
     
     print("""post GS students
-        ------------------------\n
+        ------------------------\n\n
           """)
 
     for key in student_dict:
         print(student_dict[key])
         
     print("""post GS sections
-        ------------------------\n
+        ------------------------\n\n
           """)
     
     for key in section_dict:
