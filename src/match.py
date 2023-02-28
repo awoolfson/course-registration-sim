@@ -156,7 +156,7 @@ def main():
     student_dict = data.student_df_to_dict(student_df)
         
     section_df = data.section_csv_to_df()
-    section_dict = data.section_df_to_dict(student_df)
+    section_dict = data.section_df_to_dict(section_df)
         
     print("\n\nall students initialized:\n\n")
         
