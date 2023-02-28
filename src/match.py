@@ -1,6 +1,8 @@
 import pandas as pd
 from Student import Student
 from CourseSection import CourseSection
+import data
+import test_stability
 
 """
 TODO
@@ -143,30 +145,6 @@ def Gale_Shapley():
             free_students.pop()
             
         print(free_students)
-        
-def is_pairwise_stable():
-    
-    # to be tested
-    
-    for key in student_dict:
-        cur_student = student_dict[key]
-
-        cur_student_remaining_schedule = cur_student.schedule # used to check if iteration has passed the lowest ranked course in schedule
-        
-        for index, section_id in enumerate(cur_student.section_ranking):
-            
-            if not section_id in cur_student.schedule:
-                if not section_dict[section_id].is_full():
-                    return False
-                else:
-                    # ok this is very ugly, fix this and make a variable for cur_section
-                    if section_dict[section_id].return_lowest_student().section_score < section_dict[section_id].score_student(cur_student):
-                        return False
-            else:
-                cur_student_remaining_schedule.remove(section_id)
-                if len(cur_student_remaining_schedule) == 0:
-                    continue # move on to next student if all prefered sections have been examined
-        return True
 
 def main():
     global student_dict
@@ -174,25 +152,11 @@ def main():
     global student_df
     global section_df
     
-    student_df = pd.read_csv("../test_data/test_students_2.csv",  delimiter = ",")
-    student_df.set_index("id", inplace = True)
-
-    print(student_df)
-
-    for index, row in student_df.iterrows():
-        new_student = Student(id = index, name = row[0], base_score = int(row[1]))
-        new_student.set_section_ranking(row[2].split(" "))
-        student_dict[new_student.id] = new_student
+    student_df = data.student_csv_to_df()
+    student_dict = data.student_df_to_dict(student_df)
         
-    section_df = pd.read_csv("../test_data/test_sections_2.csv")
-    section_df.set_index("id", inplace = True)
-
-    print(section_df)
-
-    for index, row in section_df.iterrows():
-        new_section = CourseSection(id = index, course_name = row[0],
-                                                capacity = int(row[1]), credits = int(row[2]))
-        section_dict[new_section.id] = new_section
+    section_df = data.section_csv_to_df()
+    section_dict = data.section_df_to_dict(student_df)
         
     print("\n\nall students initialized:\n\n")
         
