@@ -1,6 +1,7 @@
 import pandas as pd
 from Student import Student
 from CourseSection import CourseSection
+import json
 
 student_filepath = "../test_data/test_students_2.csv"
 section_filepath = "../test_data/test_sections_2.csv"
@@ -33,3 +34,16 @@ def section_df_to_dict(section_df):
                                                 capacity = int(row[1]), credits = int(row[2]))
         section_dict[new_section.id] = new_section
     return section_dict
+
+def section_JSON_to_dict(filepath):
+    with open (filepath, 'r') as f:
+        raw_sections = json.loads(f.read())
+    section_dict = {}
+    for crn in raw_sections:
+        data = raw_sections[crn]
+        print(crn)
+        print(str(data))
+
+section_JSON_to_dict('../scraping/classes.json')
+    
+    

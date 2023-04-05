@@ -1,5 +1,5 @@
 import pandas as pd
-import Student 
+import Student
 import heapq
 class CourseSection:
     

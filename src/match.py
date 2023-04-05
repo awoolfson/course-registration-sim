@@ -6,13 +6,14 @@ import test_stability
 
 """
 TODO
-- random test input generation file
-- seperate testing file, (and data i/o file)?
-- make sure test stability works
-- create a refresh preferences method for students that puts the courses that fit into credits on top, 
-  will eventually handle backups etc
-- account for credits issue
-- test for efficiency / calculate time complexity
+- expand section class for new course data
+- create a basic student scoring function instead of just base score
+- generate students to go with new course data
+- test on full data set
+- more distant issues:
+    - create a refresh preferences method for students that puts the courses that fit into credits on top, 
+    will eventually handle backups etc
+    - account for credits issue
 """
 
 section_df = pd.DataFrame() # dataframe serves as intemediary between CSV and dict
@@ -184,5 +185,11 @@ def main():
     for key in section_dict:
         print(section_dict[key])
         
+    # student_dict[40000000].section_ranking[0] = 800000
+    # used for testing instability
+        
+    is_pairwise_stable = test_stability.is_pairwise_stable(student_dict=student_dict, section_dict=section_dict)
+    print(f'\n\nThis matching is pairwise stable? {is_pairwise_stable}')
+         
 main()
     
