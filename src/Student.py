@@ -2,8 +2,9 @@ import pandas as pd
 import CourseSection
 
 class Student: 
-    def __init__(self, id: int, name: str, base_score: int):
+    def __init__(self, id: int, name: str, base_score: int, major: str):
         self.id = id # 8 digit ID
+        self.major = major
         self.credit_limit = 16
         self.base_score = base_score
         self.name = name

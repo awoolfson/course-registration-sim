@@ -38,7 +38,7 @@ def get_df_student(id: int):
 def get_df_section(id: int):
     print(section_df.index)
     row = section_df.loc[id]
-    section = CourseSection(id = id, course_name = row[0],
+    section = CourseSection(id = id, code = row[0],
                                                 capacity = int(row[1]), credits = int(row[2]))
     return section
 
@@ -66,17 +66,17 @@ def try_enrolling(student: Student, section: CourseSection):
     
         section.swapped_out = (False, 0) # default to no student swapping
         if student.credits_enrolled + section.credits > student.credit_limit: # this is maybe redundant with  new is free method?
-            print(f'student #{student.name} could not enroll in section {section.course_name}: {section.id}'
+            print(f'student #{student.name} could not enroll in section {section.course_code}: {section.id}'
                   +' because they are taking too many credits\n\n')
             return student, section
         elif section.is_full():
             if section.score_student(student) > section.return_lowest_student().section_score:
                 removed_student = section.pop_lowest_student() # currently does nothing, try new addition to removed dict?
                 section.swapped_out = (True, removed_student.id)
-                print(f'student {removed_student.name} swapped out for {student.name}\n in section: {section.course_name}: {section.id}\n\n')
+                print(f'student {removed_student.name} swapped out for {student.name}\n in section: {section.course_code}: {section.id}\n\n')
                 return add_student_to_section(student, section)
             else:
-                print(f'student #{student.name} could not enroll in section {section.course_name}: {section.id}'
+                print(f'student #{student.name} could not enroll in section {section.course_code}: {section.id}'
                   +' because the section is full of higher priority students\n\n')
                 return student, section
         else:
@@ -127,7 +127,7 @@ def Gale_Shapley():
             student_dict[cur_student.id] = cur_student_new
             section_dict[proposed_section_new.id] = proposed_section_new
             
-            print(f"{cur_student.name} after proposal:\n\n {cur_student_new}\n\n {proposed_section_new.course_name}: "
+            print(f"{cur_student.name} after proposal:\n\n {cur_student_new}\n\n {proposed_section_new.course_code}: "
                   + f"{proposed_section_new.id} after proposal: \n\n {proposed_section_new}\n\n")
             
             # if a student in the section has been replaced
