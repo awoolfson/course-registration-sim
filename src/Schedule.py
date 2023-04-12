@@ -1,4 +1,3 @@
-
 class Schedule:
     
     def __init__(self, days: list, times: list):
@@ -30,15 +29,26 @@ class Schedule:
                         hour += 12
                     numeric_times.append((hour, minute))
             for i in range(0, len(numeric_times), 2):
-                self.times.append((numeric_times[i], numeric_times[i+1]))
+                self.times.append((numeric_times[i][0] * 60 + numeric_times[i][1],
+                                   numeric_times[i+1][0] * 60 + numeric_times[i+1][1]))
                 
         for i, entry in enumerate(days):
             for day in entry:
                 self.day_dict[day] = self.times[i]
                 
         def __eq__(self, other):
-            # just for checking for conflicts, not actual equivelence
-            # for day in self.day_dict:
-               # if other.day_dict[day] #ok gotta figure out time tuples here
-            return True
+            # only tests if schedules conflict, aren't fully equal
+            for day in self.day_dict:
+                time = self.day_dict[day]
+                other_time = other.day_dict[day]
+                if time != () and other_time != ():
+                    if time[0] > other_time[1]:
+                        return False
+                    elif time[1] < other_time[0]:
+                        return False
+                    else:
+                        return True
+                    
+                    
+                    
     

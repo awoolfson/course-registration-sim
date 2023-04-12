@@ -33,7 +33,8 @@ def section_df_to_dict(section_df):
     for index, row in section_df.iterrows():
         new_section = CourseSection(id = index, code = row[0],
                                                 capacity = int(row[1]), credits = int(row[2]),
-                                                dept = row[3], name = row[4]) #add time and days to this
+                                                dept = row[3], name = row[4], days = row[5].split(" "),
+                                                times = row[6].split('+')) #add time and days to this
         section_dict[new_section.id] = new_section
     return section_dict
 
@@ -45,7 +46,7 @@ def section_JSON_to_dict(filepath):
         data = raw_sections[crn]
         new_section = CourseSection(id = int(crn), code = data['code'],
                                     capacity = int(data['cap']), credits = 4, #credits = int(data['credits'][0]),
-                                    name = data['name'], dept = data['dept'], times = data['time'], # time is an array, can be different on different days. Handle later
+                                    name = data['name'], dept = data['dept'], times = data['time'],
                                     days = data['days'])
         section_dict[int(crn)] = new_section
     return section_dict

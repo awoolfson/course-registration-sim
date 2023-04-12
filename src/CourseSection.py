@@ -15,6 +15,7 @@ class CourseSection:
         self.number_enrolled = 0
         self.swapped_out = (False, 0) # this lets the algorithm know if a student was swapped out and which student
         self.student_section_scores = {}
+        self.schedule = Schedule(times = times, days = days)
             
     def __str__(self):
         roster = []
