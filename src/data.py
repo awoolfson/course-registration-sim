@@ -2,6 +2,7 @@ import pandas as pd
 from Student import Student
 from CourseSection import CourseSection
 import json
+import random
 
 student_filepath = "../test_data/test_students_2.csv"
 section_filepath = "../test_data/test_sections_2.csv"
@@ -32,7 +33,7 @@ def section_df_to_dict(section_df):
     for index, row in section_df.iterrows():
         new_section = CourseSection(id = index, code = row[0],
                                                 capacity = int(row[1]), credits = int(row[2]),
-                                                dept = row[3], name = row[4])
+                                                dept = row[3], name = row[4]) #add time and days to this
         section_dict[new_section.id] = new_section
     return section_dict
 
@@ -43,10 +44,37 @@ def section_JSON_to_dict(filepath):
     for crn in raw_sections:
         data = raw_sections[crn]
         new_section = CourseSection(id = int(crn), code = data['code'],
-                                    capacity = int(data['cap']), credits = int(data['credits'][0]),
-                                    name = data['name'], dept = data['dept'])
+                                    capacity = int(data['cap']), credits = 4, #credits = int(data['credits'][0]),
+                                    name = data['name'], dept = data['dept'], times = data['time'], # time is an array, can be different on different days. Handle later
+                                    days = data['days'])
         section_dict[int(crn)] = new_section
-
-#section_JSON_to_dict('../scraping/classes.json')
-    
-    
+    return section_dict
+        
+def generate_students(section_dict, n):
+    depts = []
+    crns = []
+    student_dict = {}
+    for crn in section_dict:
+        crns.append(crn)
+        if section_dict[crn].dept not in depts:
+            depts.append(section_dict[crn].dept)
+    for i in range(n):
+        id = i
+        year = random.randint(1, 5)
+        name = "student" + str(i) + "(" + str(year) + ")"
+        base_score = year * 100
+        major = random.choice(depts)
+        section_ranking = []
+        used_indices = []
+        section_index = random.randrange(0, len(crns))
+        for c in range(10):
+            while section_index in used_indices:
+                section_index = random.randrange(0, len(crns))
+            used_indices.append(section_index)
+            section_id = crns[section_index]
+            section_ranking.append(section_id)
+        new_student = Student(id = id, name = name, base_score = base_score,
+                              major = major)
+        new_student.set_section_ranking(section_ranking)
+        student_dict[id] = new_student
+    return student_dict

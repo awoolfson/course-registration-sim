@@ -6,14 +6,15 @@ import test_stability
 
 """
 TODO
-- expand section class for new course data
-- create a basic student scoring function instead of just base score
-- generate students to go with new course data
-- test on full data set
+- try to test the testing method
+- figure out how to handle time conflicts
 - more distant issues:
     - create a refresh preferences method for students that puts the courses that fit into credits on top, 
     will eventually handle backups etc
     - account for credits issue
+    - create a back-ups system
+    
+- BE AWARE SECTIONS WITH CAPACITY 0 CAUSE A PROBLEM
 """
 
 section_df = pd.DataFrame() # dataframe serves as intemediary between CSV and dict
@@ -153,11 +154,14 @@ def main():
     global student_df
     global section_df
     
-    student_df = data.student_csv_to_df()
-    student_dict = data.student_df_to_dict(student_df)
+    # student_df = data.student_csv_to_df()
+    # student_dict = data.student_df_to_dict(student_df)
         
-    section_df = data.section_csv_to_df()
-    section_dict = data.section_df_to_dict(section_df)
+    # section_df = data.section_csv_to_df()
+    # section_dict = data.section_df_to_dict(section_df)
+    
+    section_dict = data.section_JSON_to_dict("../scraping/classes.json")
+    student_dict = data.generate_students(section_dict, 200)
         
     print("\n\nall students initialized:\n\n")
         

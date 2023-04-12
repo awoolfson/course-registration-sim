@@ -1,9 +1,10 @@
 import pandas as pd
 import Student
 import heapq
+import Schedule
 class CourseSection:
     
-    def __init__(self, id: int, code: str, capacity: int, credits: int, dept: str, name: str):
+    def __init__(self, id: int, code: str, capacity: int, credits: int, dept: str, name: str, times: list, days: list):
         self.id = id # 6 digit CRN
         self.capacity = capacity
         self.credits = credits
@@ -14,7 +15,7 @@ class CourseSection:
         self.number_enrolled = 0
         self.swapped_out = (False, 0) # this lets the algorithm know if a student was swapped out and which student
         self.student_section_scores = {}
-        
+            
     def __str__(self):
         roster = []
         for s in self.roster_pq:
