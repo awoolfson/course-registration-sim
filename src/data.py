@@ -55,10 +55,12 @@ def generate_students(section_dict, n):
     depts = []
     crns = []
     student_dict = {}
+    
     for crn in section_dict:
         crns.append(crn)
         if section_dict[crn].dept not in depts:
             depts.append(section_dict[crn].dept)
+            
     for i in range(n):
         id = i
         year = random.randint(1, 5)
@@ -68,7 +70,8 @@ def generate_students(section_dict, n):
         section_ranking = []
         used_indices = []
         section_index = random.randrange(0, len(crns))
-        for c in range(10):
+        
+        for c in range(10): # gives students 10 picks for courses
             while section_index in used_indices:
                 section_index = random.randrange(0, len(crns))
             used_indices.append(section_index)
@@ -77,5 +80,8 @@ def generate_students(section_dict, n):
         new_student = Student(id = id, name = name, base_score = base_score,
                               major = major)
         new_student.set_section_ranking(section_ranking)
+        
+        new_student.find_conflicts(section_dict)
+        
         student_dict[id] = new_student
     return student_dict

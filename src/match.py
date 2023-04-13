@@ -46,7 +46,7 @@ def get_df_section(id: int):
 def update_student_df(student: Student):
     # currently only updates section ranking and schedule
     student_df.at[student.id, 3] = str(student.section_ranking)
-    student_df.at[student.id, 4] = str(student.schedule)
+    student_df.at[student.id, 4] = str(student.enrolled_in)
     
 def update_section_df(section: CourseSection):
     # currently only updates roster, will need to update removed if I end up using it

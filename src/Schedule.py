@@ -8,18 +8,30 @@ class Schedule:
             'T':(),
             'W':(),
             'R':(),
-            'F':()
+            'F':(),
+            'TBA': False
             }
         
-        to_be_anounced = False
+        self.to_be_anounced = False
+        
+        # handle sections marked TBA
+        
         for i in range(len(times)):
-            if times[i] == "TBA":
-                self.times = ["TBA"]
-                to_be_anounced = True
-        if not to_be_anounced:
+            if times[i] == 'TBA':
+                self.times = ['TBA']
+                self.to_be_anounced = True
+                self.day_dict['TBA'] = True
+                break
+                
+        if not self.to_be_anounced:
+            
+        # construct numeric times as (hour, minute) tuples
+            
             for i in range(len(times)):
                 times[i] = times[i].split(" ")
+                
             numeric_times=[]
+            
             for time in times:
                 for i in [0, 3]:
                     parts = time[i].partition(":")
@@ -28,9 +40,14 @@ class Schedule:
                     if time[i+1] == 'pm':
                         hour += 12
                     numeric_times.append((hour, minute))
+                    
+        # convert times to values in minutes, append to self.times
+                    
             for i in range(0, len(numeric_times), 2):
                 self.times.append((numeric_times[i][0] * 60 + numeric_times[i][1],
                                    numeric_times[i+1][0] * 60 + numeric_times[i+1][1]))
+                
+        # update dict to include meeting times for days
                 
         for i, entry in enumerate(days):
             for day in entry:

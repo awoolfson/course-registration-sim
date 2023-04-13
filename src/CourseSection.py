@@ -1,7 +1,7 @@
 import pandas as pd
 import Student
 import heapq
-import Schedule
+from Schedule import Schedule
 class CourseSection:
     
     def __init__(self, id: int, code: str, capacity: int, credits: int, dept: str, name: str, times: list, days: list):
@@ -21,7 +21,7 @@ class CourseSection:
         roster = []
         for s in self.roster_pq:
             roster.append(s.id)
-        return f'{self.course_code}:\n id: {self.id}\n capacity: {self.capacity}\n credits: {self.credits}\n' + f'roster: {roster}'
+        return f'{self.course_code}:\n id: {self.id}\n capacity: {self.capacity}\n credits: {self.credits}\n' + f'roster: {roster}\n' + f'schedule: {self.schedule.day_dict}'
     
     def score_student(self, student: Student):
         id = student.id
@@ -51,3 +51,4 @@ class CourseSection:
     def enroll(self, student: Student):
         student.section_score = self.score_student(student)
         heapq.heappush(self.roster_pq, student)
+        
