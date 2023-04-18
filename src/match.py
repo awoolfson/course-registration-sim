@@ -6,13 +6,11 @@ import test_stability
 
 """
 TODO
-- try to test the testing method
-- figure out how to handle time conflicts
-- more distant issues:
-    - create a refresh preferences method for students that puts the courses that fit into credits on top, 
-    will eventually handle backups etc
-    - account for credits issue
-    - create a back-ups system
+- time conflicts
+    - figure out the pointers and get top section methods
+- update testing method
+    - account for time conflicts
+- back ups system
     
 - BE AWARE SECTIONS WITH CAPACITY 0 CAUSE A PROBLEM
 """

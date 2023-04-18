@@ -52,6 +52,7 @@ def section_JSON_to_dict(filepath):
     return section_dict
         
 def generate_students(section_dict, n):
+    # MAKE MORE REALISTIC
     depts = []
     crns = []
     student_dict = {}
