@@ -6,52 +6,15 @@ import test_stability
 
 """
 TODO
-- time conflicts
-    - figure out the pointers and get top section methods
-- update testing method
-    - account for time conflicts
-- back ups system
-    
-- BE AWARE SECTIONS WITH CAPACITY 0 CAUSE A PROBLEM
+- clean data
+- finish time conflicts implementation
+- add full student scoring function
 """
 
 section_df = pd.DataFrame() # dataframe serves as intemediary between CSV and dict
 section_dict = {} # source of truth during program
 student_df = pd.DataFrame()
 student_dict = {}
-
-def student_dict_to_df():
-    for key in student_dict:
-        update_student_df(student_dict[key])
-
-def section_dict_to_df():
-    for key in section_dict:
-        update_section_df(section_dict[key])
-
-def get_df_student(id: int):
-    row = student_df.loc[id] # figure out how to make this work next!
-    student = Student(id = id, name = row[0], base_score = int(row[1]))
-    student.set_section_ranking(row[2].split(" "))
-    return student
-
-def get_df_section(id: int):
-    print(section_df.index)
-    row = section_df.loc[id]
-    section = CourseSection(id = id, code = row[0],
-                                                capacity = int(row[1]), credits = int(row[2]))
-    return section
-
-def update_student_df(student: Student):
-    # currently only updates section ranking and schedule
-    student_df.at[student.id, 3] = str(student.section_ranking)
-    student_df.at[student.id, 4] = str(student.enrolled_in)
-    
-def update_section_df(section: CourseSection):
-    # currently only updates roster, will need to update removed if I end up using it
-    roster = []
-    for student in section.roster_pq:
-        roster.append(student.id)
-    section_df.at[section.id, 'roster_ids'] = str(roster)[1:-1]
 
 def add_student_to_section(student: Student, section: CourseSection):
     student.join_section(section)
