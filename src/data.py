@@ -5,7 +5,7 @@ import json
 import random
 
 student_filepath = "../test_data/test_students_2.csv"
-section_filepath = "../test_data/test_sections_2.csv"
+section_filepath = "../test_data/test_sections_2_rogue.csv"
 
 def student_csv_to_df():
     student_df = pd.read_csv(student_filepath,  delimiter = ",")
