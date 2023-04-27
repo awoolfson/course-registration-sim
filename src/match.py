@@ -6,9 +6,12 @@ import test_stability
 
 """
 TODO
-- clean data
 - finish time conflicts implementation
+- test stability method update with counter
+- nice data
+- Design patters for the objects
 - add full student scoring function
+- implement different generate students method
 """
 
 section_df = pd.DataFrame() # dataframe serves as intemediary between CSV and dict
@@ -44,16 +47,18 @@ def try_enrolling(student: Student, section: CourseSection):
         else:
             return add_student_to_section(student, section)
         
-def try_enrolling_next_section(student: Student):
+def try_enrolling_top_section(student: Student):
     
     # handles student top section pointer and calls try_enrolling
     
     proposed_section = section_dict[student.get_top_section_id()]
     print(f"trying to enroll {student.name} in {proposed_section.course_name}\n\n")
-    student.increment_next_section()
+    student.add_proposal(proposed_section.id)
     return try_enrolling(student, proposed_section)
         
 def Gale_Shapley():
+    
+    print("\nstarting Gale-Shapley\n")
     
     # initialize and populate free students list
     
@@ -69,19 +74,13 @@ def Gale_Shapley():
         
         # while student has more sections to propose to
         
-        while not cur_student.is_finished_proposing():
+        while cur_student.can_propose():
             
             print(f"proposing student: {cur_student.name}\n\n")
             
-            # if they have no more credits they can fulfill
-            
-            if not cur_student.has_credits_to_fill(section_dict[cur_student.get_top_section_id()].credits):
-                print(f"{cur_student.name} has reached their credit limit\n\n")
-                break
-            
             # try enrolling student in favorite section
             
-            updated_agents = try_enrolling_next_section(cur_student)
+            updated_agents = try_enrolling_top_section(cur_student)
             cur_student_new, proposed_section_new = updated_agents[0], updated_agents[1]
             
             # update dictionaries with returned student and section objects
@@ -115,19 +114,21 @@ def main():
     global student_df
     global section_df
     
-    # student_df = data.student_csv_to_df()
-    # student_dict = data.student_df_to_dict(student_df)
+    student_df = data.student_csv_to_df()
+    student_dict = data.student_df_to_dict(student_df)
         
-    # section_df = data.section_csv_to_df()
-    # section_dict = data.section_df_to_dict(section_df)
+    section_df = data.section_csv_to_df()
+    section_dict = data.section_df_to_dict(section_df)
     
-    section_dict = data.section_JSON_to_dict("../scraping/classes.json")
-    student_dict = data.generate_students(section_dict, 200)
+    # section_dict = data.section_JSON_to_dict("../scraping/classes.json")
+    # student_dict = data.generate_students(section_dict, 200)
         
     print("\n\nall students initialized:\n\n")
         
     for key in student_dict:
         print(student_dict[key])
+        student_dict[key].find_conflicts(section_dict)
+        print(student_dict[key].conflicts_dict)
         
     print("all sections initialized\n\n")
     
@@ -136,15 +137,17 @@ def main():
         
     Gale_Shapley()
     
-    print("""post GS students
-        ------------------------\n\n
+    print("""
+          post GS students
+        ------------------------\n
           """)
 
     for key in student_dict:
         print(student_dict[key])
         
-    print("""post GS sections
-        ------------------------\n\n
+    print("""
+          post GS sections
+        ------------------------\n
           """)
     
     for key in section_dict:

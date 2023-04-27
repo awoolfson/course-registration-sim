@@ -34,7 +34,7 @@ def section_df_to_dict(section_df):
         new_section = CourseSection(id = index, code = row[0],
                                                 capacity = int(row[1]), credits = int(row[2]),
                                                 dept = row[3], name = row[4], days = row[5].split(" "),
-                                                times = row[6].split('+')) #add time and days to this
+                                                times = row[6].split('+'))
         section_dict[new_section.id] = new_section
     return section_dict
 

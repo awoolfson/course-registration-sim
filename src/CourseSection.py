@@ -21,7 +21,7 @@ class CourseSection:
         roster = []
         for s in self.roster_pq:
             roster.append(s.id)
-        return f'{self.course_code}:\n id: {self.id}\n capacity: {self.capacity}\n credits: {self.credits}\n' + f'roster: {roster}\n' + f'schedule: {self.schedule.day_dict}'
+        return f'{self.dept}{self.course_code}:\n id: {self.id}\n capacity: {self.capacity}\n credits: {self.credits}\n' + f'roster: {roster}\n' + f'schedule: {self.schedule}'
     
     def score_student(self, student: Student):
         id = student.id
