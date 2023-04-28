@@ -2,6 +2,8 @@ import pandas as pd
 import Student
 import heapq
 from Schedule import Schedule
+import random
+
 class CourseSection:
     
     def __init__(self, id: int, code: str, capacity: int, credits: int, dept: str, name: str, times: list, days: list):

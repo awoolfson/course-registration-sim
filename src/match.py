@@ -6,11 +6,7 @@ import test_stability
 
 """
 TODO
-- finish time conflicts implementation
-- test stability method update with counter
 - nice data
-- Design patters for the objects
-- add full student scoring function
 - implement different generate students method
 """
 
