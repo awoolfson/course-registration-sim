@@ -50,6 +50,11 @@ def section_JSON_to_dict(filepath):
                                     days = data['days'])
         section_dict[int(crn)] = new_section
     return section_dict
+
+def remove_TBAs(section_dict) -> dict:
+    for crn in section_dict:
+        if section_dict[crn].days == ['TBA'] or section_dict[crn].times == ['TBA']:
+            section_dict.pop(crn)
         
 def generate_students(section_dict, n):
     # MAKE MORE REALISTIC

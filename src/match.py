@@ -3,10 +3,10 @@ from Student import Student
 from CourseSection import CourseSection
 import data
 import test_stability
+import sys
 
 """
 TODO
-- nice data
 - implement different generate students method
 """
 
@@ -105,55 +105,56 @@ def Gale_Shapley():
         print(free_students)
 
 def main():
-    global student_dict
-    global section_dict
-    global student_df
-    global section_df
-    
-    student_df = data.student_csv_to_df()
-    student_dict = data.student_df_to_dict(student_df)
+    if __name__ == "__main__":
+        global student_dict
+        global section_dict
+        global student_df
+        global section_df
         
-    section_df = data.section_csv_to_df()
-    section_dict = data.section_df_to_dict(section_df)
-    
-    # section_dict = data.section_JSON_to_dict("../scraping/classes.json")
-    # student_dict = data.generate_students(section_dict, 200)
+        # student_df = data.student_csv_to_df()
+        # student_dict = data.student_df_to_dict(student_df)
+            
+        # section_df = data.section_csv_to_df()
+        # section_dict = data.section_df_to_dict(section_df)
         
-    print("\n\nall students initialized:\n\n")
+        section_dict = data.section_JSON_to_dict("../scraping/classes.json")
+        student_dict = data.generate_students(section_dict, 30)
+            
+        print("\n\nall students initialized:\n\n")
+            
+        for key in student_dict:
+            print(student_dict[key])
+            student_dict[key].find_conflicts(section_dict)
+            print(student_dict[key].conflicts_dict)
+            
+        print("all sections initialized\n\n")
         
-    for key in student_dict:
-        print(student_dict[key])
-        student_dict[key].find_conflicts(section_dict)
-        print(student_dict[key].conflicts_dict)
+        for key in section_dict:
+            print(section_dict[key])
+            
+        Gale_Shapley()
         
-    print("all sections initialized\n\n")
-    
-    for key in section_dict:
-        print(section_dict[key])
-        
-    Gale_Shapley()
-    
-    print("""
-          post GS students
-        ------------------------\n
-          """)
+        print("""
+            post GS students
+            ------------------------\n
+            """)
 
-    for key in student_dict:
-        print(student_dict[key])
+        for key in student_dict:
+            print(student_dict[key])
+            
+        print("""
+            post GS sections
+            ------------------------\n
+            """)
         
-    print("""
-          post GS sections
-        ------------------------\n
-          """)
-    
-    for key in section_dict:
-        print(section_dict[key])
-        
-    # student_dict[40000000].section_ranking[0] = 800000
-    # used for testing instability
-        
-    is_pairwise_stable = test_stability.is_pairwise_stable(student_dict=student_dict, section_dict=section_dict)
-    print(f'\n\nThis matching is pairwise stable? {is_pairwise_stable}')
+        for key in section_dict:
+            print(section_dict[key])
+            
+        # student_dict[40000000].section_ranking[0] = 800000
+        # used for testing instability
+            
+        is_pairwise_stable = test_stability.is_pairwise_stable(student_dict=student_dict, section_dict=section_dict)
+        print(f'\n\nThis matching is pairwise stable? {is_pairwise_stable}')
          
 main()
     

@@ -11,6 +11,7 @@ import pandas as pd
 def update_classes() -> None:
     raw_data = fetch_data()
     classes = parse_data(raw_data)
+    classes = clean_data(classes)
     save_data(classes)
 
 
@@ -148,9 +149,19 @@ def parse_data(fetched_content: bytes) -> Dict[str, Dict]:
         }
         crn = cls[0].string.strip()
         classes[crn] = cls_data
-    print(classes)
     return classes
 
+def clean_data(classes: Dict[str, Dict]) -> Dict[str, Dict]:
+    to_pop = []
+    for crn in classes:
+        if "TBA" in classes[crn]["days"] or "TBA" in classes[crn]["time"]:
+            to_pop.append(crn)
+            continue
+        elif classes[crn]["cap"] == "0":
+            to_pop.append(crn)
+    for crn in to_pop:
+        classes.pop(crn)
+    return classes
 
 def save_data(classes: Dict[str, Dict]) -> None:
     with open("classes.json", "w") as f:

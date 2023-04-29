@@ -50,6 +50,9 @@ class CourseSection:
     def is_full(self):
         return len(self.roster_pq) >= self.capacity
     
+    def is_empty(self):
+        return len(self.roster_pq) == 0
+    
     def enroll(self, student: Student):
         student.section_score = self.score_student(student)
         heapq.heappush(self.roster_pq, student)
