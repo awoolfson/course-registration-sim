@@ -1,0 +1,170 @@
+{
+    "90002": {
+      "dept": "ACC",
+      "code": "101",
+      "section": "1",
+      "name": "ACCOUNTING I",
+      "days": [
+        "MW"
+      ],
+      "time": [
+        "1:15 pm - 2:30 pm"
+      ],
+      "instructor": "Noel Garrett (P)",
+      "credits": "4.000",
+      "attrs": "",
+      "cap": "65"
+    },
+    "90003": {
+      "dept": "ACC",
+      "code": "201",
+      "section": "1",
+      "name": "ACCOUNTING II",
+      "days": [
+        "TR"
+      ],
+      "time": [
+        "10:25 am - 11:40 am"
+      ],
+      "instructor": "Noel Garrett (P)",
+      "credits": "4.000",
+      "attrs": "",
+      "cap": "50"
+    },
+    "90046": {
+      "dept": "ART",
+      "code": "207",
+      "section": "1",
+      "name": "DESIGN: TYPE AND IMAGE",
+      "days": [
+        "MW",
+        "MW"
+      ],
+      "time": [
+        "10:25 am - 11:40 am",
+        "10:25 am - 11:40 am"
+      ],
+      "instructor": "Andrea J. Wollensak (P)",
+      "credits": "4.000",
+      "attrs": "MOIA",
+      "cap": "16"
+    },
+    "90047": {
+      "dept": "ART",
+      "code": "208",
+      "section": "1",
+      "name": "DESIGN: OBJECT AND ENVIRONMENT",
+      "days": [
+        "MW",
+        "MW"
+      ],
+      "time": [
+        "1:15 pm - 2:30 pm",
+        "1:15 pm - 2:30 pm"
+      ],
+      "instructor": "Andrea J. Wollensak (P)",
+      "credits": "4.000",
+      "attrs": "MOIA",
+      "cap": "12"
+    },
+    "90048": {
+      "dept": "AT",
+      "code": "208",
+      "section": "1",
+      "name": "DESIGN: OBJECT AND ENIVORNMENT",
+      "days": [
+        "MW",
+        "MW"
+      ],
+      "time": [
+        "1:15 pm - 2:30 pm",
+        "1:15 pm - 2:30 pm"
+      ],
+      "instructor": "Andrea J. Wollensak (P)",
+      "credits": "4.000",
+      "attrs": "MOIA",
+      "cap": "12"
+    },
+    "90049": {
+      "dept": "ART",
+      "code": "212",
+      "section": "1",
+      "name": "INTRODUCTION TO PAINTING",
+      "days": [
+        "TR"
+      ],
+      "time": [
+        "1:15 pm - 4:00 pm"
+      ],
+      "instructor": "Chris Barnard (P)",
+      "credits": "4.000",
+      "attrs": "MOIA",
+      "cap": "16"
+    },
+    "90050": {
+      "dept": "ART",
+      "code": "217",
+      "section": "1",
+      "name": "CERAMIC SCULPT:VESSEL CONSTRUC",
+      "days": [
+        "MW"
+      ],
+      "time": [
+        "1:15 pm - 4:00 pm"
+      ],
+      "instructor": "Denise M. Pelletier (P)",
+      "credits": "4.000",
+      "attrs": "MOIA",
+      "cap": "8"
+    },
+    "90051": {
+      "dept": "ART",
+      "code": "226",
+      "section": "1",
+      "name": "SCULPTURE FOR A SMALL PLANET",
+      "days": [
+        "WF"
+      ],
+      "time": [
+        "1:15 pm - 2:30 pm"
+      ],
+      "instructor": "Greg Bailey (P)",
+      "credits": "4.000",
+      "attrs": "MOIA",
+      "cap": "8"
+    },
+    "90052": {
+      "dept": "ART",
+      "code": "300",
+      "section": "1",
+      "name": "ADVANCED PHOTOGRAPHY",
+      "days": [
+        "TR",
+        "TR"
+      ],
+      "time": [
+        "11:50 am - 1:05 pm",
+        "11:50 am - 1:05 pm"
+      ],
+      "instructor": "Amanda R. Wallace (P)",
+      "credits": "4.000",
+      "attrs": "MOIA",
+      "cap": "10"
+    },
+    "90053": {
+      "dept": "ART",
+      "code": "349",
+      "section": "1",
+      "name": "SEMINAR FOR ART MAJORS",
+      "days": [
+        "T"
+      ],
+      "time": [
+        "7:00 pm - 9:45 pm"
+      ],
+      "instructor": "Denise M. Pelletier (P)",
+      "credits": "4.000",
+      "attrs": "",
+      "cap": "18"
+    }
+}

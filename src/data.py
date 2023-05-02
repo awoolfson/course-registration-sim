@@ -57,7 +57,6 @@ def remove_TBAs(section_dict) -> dict:
             section_dict.pop(crn)
         
 def generate_students(section_dict, n):
-    # MAKE MORE REALISTIC
     depts = []
     crns = []
     student_dict = {}
@@ -70,18 +69,64 @@ def generate_students(section_dict, n):
     for i in range(n):
         id = i
         year = random.randint(1, 5)
-        name = "student" + str(i) + "(" + str(year) + ")"
         base_score = year * 100
         major = random.choice(depts)
+        name = "student" + str(i) + "(" + major + str(year) + ")"
         section_ranking = []
-        used_indices = []
         section_index = random.randrange(0, len(crns))
         
-        for c in range(10): # gives students 10 picks for courses
-            while section_index in used_indices:
-                section_index = random.randrange(0, len(crns))
-            used_indices.append(section_index)
-            section_id = crns[section_index]
+        crn_options = crns
+        
+        for c in range(random.randrange(8, 11)): # gives students 10 picks for courses
+            section_index = random.randrange(0, len(crn_options))
+            section_id = crn_options[section_index]
+            crn_options.remove(section_id)
+            section_ranking.append(section_id)
+        new_student = Student(id = id, name = name, base_score = base_score,
+                              major = major)
+        new_student.set_section_ranking(section_ranking)
+        
+        new_student.find_conflicts(section_dict)
+        
+        student_dict[id] = new_student
+    return student_dict
+
+def generate_students_weighted(section_dict, n):
+    depts = []
+    crns = []
+    student_dict = {}
+    
+    for crn in section_dict:
+        crns.append(crn)
+        if section_dict[crn].dept not in depts:
+            depts.append(section_dict[crn].dept)
+            
+    for i in range(n):
+        id = i
+        year = random.randint(1, 5)
+        base_score = year * 100
+        major = random.choice(depts)
+        name = "student" + str(i) + "(" + major + str(year) + ")"
+        section_ranking = []
+        section_index = random.randrange(0, len(crns))
+        crn_options = list(crns)
+        for c in range(random.randrange(5, 11)): # gives students 10 picks for courses
+            section_id = None
+            coin = random.randrange(0, 2)
+            if coin == 1:
+                maj_dept = []
+                for crn in crn_options:
+                    if section_dict[crn].dept == major:
+                        maj_dept.append(crn)
+                if len(maj_dept) > 0:
+                    section_id = random.choice(maj_dept)
+            if section_id == None:
+                section_index = random.randrange(0, len(crn_options))
+                section_id = crn_options[section_index]
+            
+            # if section is not in the same major, the student will have a 50% chance of choosing a new one in major
+                            
+            crn_options.remove(section_id)
             section_ranking.append(section_id)
         new_student = Student(id = id, name = name, base_score = base_score,
                               major = major)

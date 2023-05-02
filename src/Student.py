@@ -1,12 +1,13 @@
 import pandas as pd
 import CourseSection
+import random
 
 class Student: 
     def __init__(self, id: int, name: str, base_score: int, major: str):
         self.id = id # 8 digit ID
         self.major = major
         self.credit_limit = 16
-        self.base_score = base_score
+        self.base_score = base_score + random.randrange(0, 100) # this exists to eliminate ties
         self.name = name
         self.section_ranking = []
         self.enrolled_in = []

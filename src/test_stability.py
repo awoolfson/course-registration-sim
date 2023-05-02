@@ -15,7 +15,7 @@ def is_pairwise_stable(student_dict, section_dict):
         cur_student = student_dict[key]
         student_rogues = []
         preferred_sections = []
-        remaining_enrolled_sections = cur_student.enrolled_in
+        remaining_enrolled_sections = list(cur_student.enrolled_in)
         
         for index, section_id in enumerate(cur_student.section_ranking):
             is_rogue = False
@@ -28,11 +28,10 @@ def is_pairwise_stable(student_dict, section_dict):
                     or cur_section.return_lowest_student().section_score < cur_section.score_student(cur_student):
                         is_rogue = True
                         
-                        # checks if it is just a time conflict (paper definition)
-                        for conflict_id in cur_student.conflicts_dict[section_id]:
-                            if conflict_id in cur_student.enrolled_in and conflict_id in preferred_sections:
+                        # checks if it is just a time conflict (paper definition)                        
+                        for preferred_id in preferred_sections:
+                            if preferred_id in cur_student.conflicts_dict[section_id] and preferred_id in cur_student.enrolled_in:
                                 is_rogue = False
-                                break
             else:
                 remaining_enrolled_sections.remove(section_id)
                 if remaining_enrolled_sections == []:
@@ -41,8 +40,7 @@ def is_pairwise_stable(student_dict, section_dict):
             if is_rogue:
                 student_rogues.append(section_id)
             preferred_sections.append(section_id)
-            
-            
+             
         rogues += map(lambda x: (cur_student.id, x), student_rogues)
             
     if len(rogues) == 0:

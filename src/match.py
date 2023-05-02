@@ -7,7 +7,7 @@ import sys
 
 """
 TODO
-- implement different generate students method
+- DEBUG: returning false rogue pairs, and student section rankings with duplicates with generate students!!
 """
 
 section_df = pd.DataFrame() # dataframe serves as intemediary between CSV and dict
@@ -118,7 +118,7 @@ def main():
         # section_dict = data.section_df_to_dict(section_df)
         
         section_dict = data.section_JSON_to_dict("../scraping/classes.json")
-        student_dict = data.generate_students(section_dict, 30)
+        student_dict = data.generate_students_weighted(section_dict, 100)
             
         print("\n\nall students initialized:\n\n")
             
