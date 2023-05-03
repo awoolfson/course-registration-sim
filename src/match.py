@@ -7,13 +7,14 @@ import sys
 
 """
 TODO
-- DEBUG: returning false rogue pairs, and student section rankings with duplicates with generate students!!
+- Why does plot return such different results from the main function?
 """
 
 section_df = pd.DataFrame() # dataframe serves as intemediary between CSV and dict
-section_dict = {} # source of truth during program
+global section_dict # source of truth during program
 student_df = pd.DataFrame()
-student_dict = {}
+global student_dict
+section_dict, student_dict = {}, {}
 
 def add_student_to_section(student: Student, section: CourseSection):
     student.join_section(section)
@@ -118,7 +119,7 @@ def main():
         # section_dict = data.section_df_to_dict(section_df)
         
         section_dict = data.section_JSON_to_dict("../scraping/classes.json")
-        student_dict = data.generate_students_weighted(section_dict, 100)
+        student_dict = data.generate_students_weighted(section_dict, 500)
             
         print("\n\nall students initialized:\n\n")
             
@@ -139,16 +140,16 @@ def main():
             ------------------------\n
             """)
 
-        for key in student_dict:
-            print(student_dict[key])
+        # for key in student_dict:
+        #     print(student_dict[key])
             
         print("""
             post GS sections
             ------------------------\n
             """)
         
-        for key in section_dict:
-            print(section_dict[key])
+        # for key in section_dict:
+        #     print(section_dict[key])
             
         # student_dict[40000000].section_ranking[0] = 800000
         # used for testing instability
