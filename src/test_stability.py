@@ -48,4 +48,5 @@ def is_pairwise_stable(student_dict, section_dict):
     else:
         is_stable = False
         print(f'# rogue pairs found: {len(rogues)}')
+        print(rogues)
     return (is_stable, rogues)

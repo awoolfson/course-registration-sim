@@ -30,7 +30,6 @@ class CourseSection:
         if id in self.student_section_scores:
             return self.student_section_scores[id]
         else:
-            # subject to change once scoring function is done
             mod = 0
             if student.major == self.dept:
                 mod = 50

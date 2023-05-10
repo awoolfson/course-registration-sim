@@ -3,12 +3,9 @@ from Student import Student
 from CourseSection import CourseSection
 import data
 import test_stability
+import GaleShapley
 import sys
 
-"""
-TODO
-- Why does plot return such different results from the main function?
-"""
 
 section_df = pd.DataFrame() # dataframe serves as intemediary between CSV and dict
 global section_dict # source of truth during program
@@ -112,14 +109,12 @@ def main():
         global student_df
         global section_df
         
-        # student_df = data.student_csv_to_df()
-        # student_dict = data.student_df_to_dict(student_df)
+        student_dict = data.student_csv_to_dict("../test_data/test_students_2.csv")
             
-        # section_df = data.section_csv_to_df()
-        # section_dict = data.section_df_to_dict(section_df)
+        section_dict = data.section_csv_to_dict("../test_data/test_sections_2_rogue.csv")
         
-        section_dict = data.section_JSON_to_dict("../scraping/classes.json")
-        student_dict = data.generate_students_weighted(section_dict, 500)
+        # section_dict = data.section_JSON_to_dict("../scraping/classes.json")
+        # student_dict = data.generate_students_weighted(section_dict, 500)
             
         print("\n\nall students initialized:\n\n")
             
@@ -135,27 +130,28 @@ def main():
             
         Gale_Shapley()
         
+        # new = GaleShapley.Gale_Shapley(student_dict, section_dict)
+        # student_dict, section_dict = new[0], new[1]
+        
+        Gale_Shapley()
+        
         print("""
             post GS students
             ------------------------\n
             """)
 
-        # for key in student_dict:
-        #     print(student_dict[key])
+        for key in student_dict:
+            print(student_dict[key])
             
         print("""
             post GS sections
             ------------------------\n
             """)
         
-        # for key in section_dict:
-        #     print(section_dict[key])
-            
-        # student_dict[40000000].section_ranking[0] = 800000
-        # used for testing instability
+        for key in section_dict:
+            print(section_dict[key])
             
         is_pairwise_stable = test_stability.is_pairwise_stable(student_dict=student_dict, section_dict=section_dict)
-        print(f'\n\nThis matching is pairwise stable? {is_pairwise_stable}')
-         
+        print(is_pairwise_stable)
 main()
     
