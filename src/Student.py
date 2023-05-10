@@ -1,4 +1,3 @@
-import pandas as pd
 import CourseSection
 import random
 
@@ -20,10 +19,11 @@ class Student:
         self.proposed_dict = {} # entries take the form {section_id: True/False}
         
     def __str__(self):
-        return f'{self.name}:\n id: {self.id}\n base_score: {self.base_score}\n section ranking: {self.section_ranking}\n schedule: {self.enrolled_in}\n credits enrolled: {self.credits_enrolled }'
+        string = (f'{self.name}:\nid: {self.id}\nbase_score: {self.base_score}\n'
+                  f'section ranking: {self.section_ranking}\nschedule: {self.enrolled_in}\ncredits enrolled: {self.credits_enrolled}\n')
+        return string
    
-    # for sorting students by section score
-    
+    # for sorting students by section score 
     def __lt__(self, other_student):
         return self.section_score < other_student.section_score
      
@@ -34,7 +34,6 @@ class Student:
         return self.section_score > other_student.section_score
      
     # sets section ranking for the student, also populates conflicts_dict and proposed_dict
-     
     def set_section_ranking(self, ranking: list):
         for i, section_id in enumerate(ranking):
             ranking[i] = int(section_id)
@@ -45,15 +44,12 @@ class Student:
         
     def can_propose(self) -> bool:
         if self.get_top_section_id() == None:
-            print(f'{self.name} top section id not found')
             return False
         elif self.credits_enrolled >= self.credit_limit:
-            print(f'{self.name} has too many credits to propose to {self.get_top_section_id()}')
             return False
         return True
     
     # join and leave section are to be used in conjunction with try_enrolling and try_enrolling_next_section
-    
     def join_section(self, section: CourseSection):
         self.credits_enrolled += section.credits
         self.enrolled_in.append(section.id)
@@ -63,17 +59,16 @@ class Student:
             self.enrolled_in.remove(section.id)
             self.credits_enrolled -= section.credits
         
+    # note that this may dramatically increase the time complexity, but practially speaking, it should be fine
     def get_top_section_id(self):
-        # note that this may dramatically increase the time complexity, but practially speaking, it should be fine
         for i in range(0, len(self.section_ranking)):
             section_id = self.section_ranking[i]
             does_conflict = False
             for c in self.conflicts_dict[section_id]:
                 if c in self.enrolled_in:
                     does_conflict = True
-                    break
             if self.proposed_dict[section_id] == False and not does_conflict:
-                return self.section_ranking[i]
+                return section_id
         return None
     
     def add_proposal(self, section_id: int):
@@ -83,16 +78,13 @@ class Student:
         has_credits = self.credit_limit - self.credits_enrolled >= credits
         return has_credits
     
+    # this method encourages students to be loaded second, after sections to find conflicts in ranking
     def find_conflicts(self, section_dict: dict):
-        # this method encourages students to be loaded second, after sections to find conflicts in ranking
-        #print(f'finding conflicts for student {self.name}')
         for index, id in enumerate(self.section_ranking):
             cur_section = section_dict[id]
             self.conflicts_dict[id] =[]
             for other_index, other_id in enumerate(self.section_ranking):
                 other_section = section_dict[other_id]
-                #print(f"other section {other_section}")
-                #print(f"cur section {cur_section}")
                 if other_id != id and other_section.schedule == cur_section.schedule:
                     self.conflicts_dict[id].append(other_section.id)
                     

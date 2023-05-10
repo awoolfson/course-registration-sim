@@ -2,7 +2,6 @@ import pandas as pd
 import Student
 import heapq
 from Schedule import Schedule
-import random
 
 class CourseSection:
     
@@ -23,7 +22,9 @@ class CourseSection:
         roster = []
         for s in self.roster_pq:
             roster.append(s.id)
-        return f'{self.dept}{self.course_code}:\n id: {self.id}\n capacity: {self.capacity}\n credits: {self.credits}\n' + f'roster: {roster}\n' + f'schedule: {self.schedule}'
+        string = (f'{self.dept}{self.course_code}: {self.course_name}\nid: {self.id}\ncapacity: {self.capacity}\n'
+        f'credits: {self.credits}\nroster: {roster}\nschedule: {self.schedule}\n')
+        return string
     
     def score_student(self, student: Student):
         id = student.id
@@ -41,7 +42,7 @@ class CourseSection:
         popped_student = heapq.heappop(self.roster_pq)
         return popped_student
     
-    def return_lowest_student(self):
+    def get_lowest_student(self):
         lowest_student = heapq.heappop(self.roster_pq)
         heapq.heappush(self.roster_pq, lowest_student)
         return lowest_student

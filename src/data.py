@@ -4,9 +4,7 @@ from CourseSection import CourseSection
 import json
 import random
 
-student_filepath = "../test_data/test_students_2.csv"
-section_filepath = "../test_data/test_sections_2_rogue.csv"
-
+# helper methods first
 def student_csv_to_df(student_filepath):
     student_df = pd.read_csv(student_filepath,  delimiter = ",")
     student_df.set_index("id", inplace = True)
@@ -97,7 +95,6 @@ def generate_students_weighted(section_dict, n):
                 section_id = crn_options[section_index]
             
             # if section is not in the same major, the student will have a 50% chance of choosing a new one in major
-                            
             crn_options.remove(section_id)
             section_ranking.append(section_id)
         new_student = Student(id = id, name = name, base_score = base_score,
@@ -108,3 +105,19 @@ def generate_students_weighted(section_dict, n):
         
         student_dict[id] = new_student
     return student_dict
+
+# heavy duyy methods
+
+def all_from_csv(student_filepath, section_filepath):
+    student_dict = student_csv_to_dict(student_filepath)
+    section_dict = section_csv_to_dict(section_filepath)
+    for key in student_dict:
+        student_dict[key].find_conflicts(section_dict)
+    return student_dict, section_dict
+
+def all_from_JSON_with_generation(filepath, n):
+    section_dict = section_JSON_to_dict(filepath)
+    student_dict = generate_students_weighted(section_dict, n)
+    for key in student_dict:
+        student_dict[key].find_conflicts(section_dict)
+    return student_dict, section_dict

@@ -1,5 +1,4 @@
 class Schedule:
-    
     def __init__(self, days: list, times: list):
         self.days = days
         self.times = []
@@ -15,7 +14,6 @@ class Schedule:
         self.to_be_anounced = False
         
         # handle sections marked TBA
-        
         for i in range(len(times)):
             if times[i] == 'TBA':
                 self.times = ['TBA']
@@ -26,7 +24,6 @@ class Schedule:
         if not self.to_be_anounced:
             
         # construct numeric times as (hour, minute) tuples
-            
             for i in range(len(times)):
                 times[i] = times[i].split(" ")
                 
@@ -42,13 +39,11 @@ class Schedule:
                     numeric_times.append((hour, minute))
                     
         # convert times to values in minutes, append to self.times
-                    
             for i in range(0, len(numeric_times), 2):
                 self.times.append((numeric_times[i][0] * 60 + numeric_times[i][1],
                                    numeric_times[i+1][0] * 60 + numeric_times[i+1][1]))
                 
         # update dict to include meeting times for days
-                
         for i, entry in enumerate(days):
             for day in entry:
                 self.day_dict[day] = self.times[i]

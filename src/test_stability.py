@@ -2,7 +2,6 @@ from Student import Student
 from CourseSection import CourseSection
 
 # checks for pairwise stabilty according to definition given in paper
-
 def is_pairwise_stable(student_dict, section_dict):
     
     is_stable = True
@@ -21,17 +20,18 @@ def is_pairwise_stable(student_dict, section_dict):
             is_rogue = False
             cur_section = section_dict[section_id]
             
+            # if fits traditional rogue pair definition
             if not section_id in cur_student.enrolled_in:
-                # if fits traditional rogue pair definition
                 if not cur_section.is_empty():
                     if not cur_section.is_full() \
-                    or cur_section.return_lowest_student().section_score < cur_section.score_student(cur_student):
+                    or cur_section.get_lowest_student().section_score < cur_section.score_student(cur_student):
                         is_rogue = True
-                        
-                        # checks if it is just a time conflict (paper definition)                        
-                        for preferred_id in preferred_sections:
-                            if preferred_id in cur_student.conflicts_dict[section_id] and preferred_id in cur_student.enrolled_in:
-                                is_rogue = False
+                else:
+                    is_rogue = True
+                # checks if it is just a time conflict (paper definition)                        
+                for preferred_id in preferred_sections:
+                    if preferred_id in cur_student.conflicts_dict[section_id] and preferred_id in cur_student.enrolled_in:
+                        is_rogue = False
             else:
                 remaining_enrolled_sections.remove(section_id)
                 if remaining_enrolled_sections == []:

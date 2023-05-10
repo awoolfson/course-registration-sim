@@ -29,7 +29,7 @@ def try_enrolling(student: Student, section: CourseSection):
                   +' because they are taking too many credits\n\n')
             return student, section
         elif section.is_full():
-            if section.score_student(student) > section.return_lowest_student().section_score:
+            if section.score_student(student) > section.get_lowest_student().section_score:
                 removed_student = section.pop_lowest_student() # currently does nothing, try new addition to removed dict?
                 section.swapped_out = (True, removed_student.id)
                 print(f'student {removed_student.name} swapped out for {student.name}\n in section: {section.course_code}: {section.id}\n\n')
@@ -136,18 +136,15 @@ def main():
         Gale_Shapley()
         
         print("""
-            post GS students
-            ------------------------\n
-            """)
-
+              GS results
+              -------------------------------
+              """)
+        
+        print("students:")
         for key in student_dict:
             print(student_dict[key])
-            
-        print("""
-            post GS sections
-            ------------------------\n
-            """)
         
+        print("sections:")
         for key in section_dict:
             print(section_dict[key])
             
