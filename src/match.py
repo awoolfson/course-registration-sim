@@ -3,8 +3,6 @@ from Student import Student
 from CourseSection import CourseSection
 import data
 import test_stability
-import GaleShapley
-import sys
 
 
 section_df = pd.DataFrame() # dataframe serves as intemediary between CSV and dict
