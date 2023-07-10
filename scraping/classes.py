@@ -3,9 +3,9 @@
 import json
 from typing import Dict
 
+import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-import pandas as pd
 
 
 def update_classes() -> None:
@@ -17,9 +17,7 @@ def update_classes() -> None:
 
 def fetch_data() -> bytes:
     url = "https://ssbprod.conncoll.edu/CONN/bwckschd.p_get_crse_unsec"
-    headers = {
-        "Content-Type": "application/x-www-form-urlencoded"
-    }
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
     data = {
         "term_in": 202290,
         "begin_ap": "a",
@@ -28,19 +26,13 @@ def fetch_data() -> bytes:
         "end_ap": "a",
         "end_hh": "0",
         "end_mi": "0",
-        "sel_attr": [
-            "dummy",
-            "%"
-        ],
+        "sel_attr": ["dummy", "%"],
         "sel_camp": "dummy",
         "sel_crse": "",
         "sel_day": "dummy",
         "sel_from_cred": "",
         "sel_insm": "dummy",
-        "sel_instr": [
-            "dummy",
-            "%"
-        ],
+        "sel_instr": ["dummy", "%"],
         "sel_levl": "dummy",
         "sel_ptrm": "dummy",
         "sel_schd": "dummy",
@@ -113,10 +105,10 @@ def fetch_data() -> bytes:
             "SLA",
             "SOC",
             "STA",
-            "THE"
+            "THE",
         ],
         "sel_title": "",
-        "sel_to_cred": ""
+        "sel_to_cred": "",
     }
     r = requests.post(url, headers=headers, data=data)
     return r.content
@@ -124,13 +116,11 @@ def fetch_data() -> bytes:
 
 def parse_data(fetched_content: bytes) -> Dict[str, Dict]:
     soup = BeautifulSoup(fetched_content, "html.parser")
-    with open("soup.txt", 'w') as f:
+    with open("soup.txt", "w") as f:
         f.write(soup.text)
-    
+
     raw_classes = soup.find("table", {"class": "bwckschd"}).findAll("td", {"class": "bwckschd_det"})
-    parsed_classes = [
-        raw_classes[i:i + 19] for i in range(0, len(raw_classes), 19)
-    ]
+    parsed_classes = [raw_classes[i : i + 19] for i in range(0, len(raw_classes), 19)]
 
     classes = {}
     date_time_separator = "%"
@@ -151,6 +141,7 @@ def parse_data(fetched_content: bytes) -> Dict[str, Dict]:
         classes[crn] = cls_data
     return classes
 
+
 def clean_data(classes: Dict[str, Dict]) -> Dict[str, Dict]:
     to_pop = []
     for crn in classes:
@@ -163,9 +154,11 @@ def clean_data(classes: Dict[str, Dict]) -> Dict[str, Dict]:
         classes.pop(crn)
     return classes
 
+
 def save_data(classes: Dict[str, Dict]) -> None:
     with open("classes.json", "w") as f:
         json.dump(classes, f)
+
 
 if __name__ == "__main__":
     update_classes()
