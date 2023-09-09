@@ -24,11 +24,11 @@ class CourseSection:
         roster = []
         for s in self.roster_pq:
             roster.append(s.id)
-        log = (
+        string = (
             f"{self.dept}{self.course_code}: {self.course_name}\nid: {self.id}\ncapacity: {self.capacity}\n"
             f"credits: {self.credits}\nroster: {roster}\nschedule: {self.schedule}\n"
         )
-        return log
+        return string
 
     def score_student(self, student: Student):
         id = student.id
