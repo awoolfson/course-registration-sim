@@ -7,7 +7,17 @@ from Schedule import Schedule
 
 
 class CourseSection:
-    def __init__(self, id: int, code: str, capacity: int, credits: int, dept: str, name: str, times: list, days: list):
+    def __init__(
+        self,
+        id: int,
+        code: str,
+        capacity: int,
+        credits: int,
+        dept: str,
+        name: str,
+        times: list,
+        days: list,
+    ):
         self.id = id  # 6 digit CRN
         self.capacity = capacity
         self.credits = credits
@@ -16,7 +26,10 @@ class CourseSection:
         self.course_name = name
         self.roster_pq = []  # sorted by section score
         self.number_enrolled = 0
-        self.swapped_out = (False, 0)  # this lets the algorithm know if a student was swapped out and which student
+        self.swapped_out = (
+            False,
+            0,
+        )  # this lets the algorithm know if a student was swapped out and which student
         self.student_section_scores = {}
         self.schedule = Schedule(times=times, days=days)
 
@@ -30,7 +43,7 @@ class CourseSection:
         )
         return string
 
-    def score_student(self, student: Student):
+    def score_student(self, student: Student) -> int:
         id = student.id
         if id in self.student_section_scores:
             return self.student_section_scores[id]
@@ -42,19 +55,19 @@ class CourseSection:
             self.student_section_scores[id] = score
             return score
 
-    def pop_lowest_student(self):
+    def pop_lowest_student(self) -> Student:
         popped_student = heapq.heappop(self.roster_pq)
         return popped_student
 
-    def get_lowest_student(self):
+    def get_lowest_student(self) -> Student:
         lowest_student = heapq.heappop(self.roster_pq)
         heapq.heappush(self.roster_pq, lowest_student)
         return lowest_student
 
-    def is_full(self):
+    def is_full(self) -> bool:
         return len(self.roster_pq) >= self.capacity
 
-    def is_empty(self):
+    def is_empty(self) -> bool:
         return len(self.roster_pq) == 0
 
     def enroll(self, student: Student):

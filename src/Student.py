@@ -1,6 +1,7 @@
 import random
 
 import CourseSection
+from typing import Optional
 
 
 class Student:
@@ -8,7 +9,9 @@ class Student:
         self.id = id  # 8 digit ID
         self.major = major
         self.credit_limit = 16
-        self.base_score = base_score + random.randrange(0, 100)  # this exists to eliminate ties
+        self.base_score = base_score + random.randrange(
+            0, 100
+        )  # this exists to eliminate ties
         self.name = name
         self.section_ranking = []
         self.enrolled_in = []
@@ -16,7 +19,9 @@ class Student:
         self.section_score = None  # compare students within a section, should not be saved to a database ever
         self.next_section_index = 0
 
-        self.conflicts_dict = {}  # entries take the form {section_id: [conflict_index, conflict_index, ...]}
+        self.conflicts_dict = (
+            {}
+        )  # entries take the form {section_id: [conflict_index, conflict_index, ...]}
 
         self.proposed_dict = {}  # entries take the form {section_id: True/False}
 
@@ -64,7 +69,7 @@ class Student:
             self.credits_enrolled -= section.credits
 
     # note that this may dramatically increase the time complexity, but practially speaking, it should be fine
-    def get_top_section_id(self):
+    def get_top_section_id(self) -> Optional[int]:
         for i in range(0, len(self.section_ranking)):
             section_id = self.section_ranking[i]
             does_conflict = False
@@ -78,16 +83,16 @@ class Student:
     def add_proposal(self, section_id: int):
         self.proposed_dict[section_id] = True
 
-    def has_credits_to_fill(self, credits: int):
+    def has_credits_to_fill(self, credits: int) -> bool:
         has_credits = self.credit_limit - self.credits_enrolled >= credits
         return has_credits
 
     # this method encourages students to be loaded second, after sections to find conflicts in ranking
     def find_conflicts(self, section_dict: dict):
-        for index, id in enumerate(self.section_ranking):
+        for id in self.section_ranking:
             cur_section = section_dict[id]
             self.conflicts_dict[id] = []
-            for other_index, other_id in enumerate(self.section_ranking):
+            for other_id in self.section_ranking:
                 other_section = section_dict[other_id]
                 if other_id != id and other_section.schedule == cur_section.schedule:
                     self.conflicts_dict[id].append(other_section.id)

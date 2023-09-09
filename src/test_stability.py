@@ -3,7 +3,7 @@ from Student import Student
 
 
 # checks for pairwise stabilty according to definition given in paper
-def is_pairwise_stable(student_dict, section_dict):
+def is_pairwise_stable(student_dict: dict, section_dict: dict) -> (bool, list):
 
     is_stable = True
     total_pairs = 0
@@ -28,7 +28,8 @@ def is_pairwise_stable(student_dict, section_dict):
                 if not cur_section.is_empty():
                     if (
                         not cur_section.is_full()
-                        or cur_section.get_lowest_student().section_score < cur_section.score_student(cur_student)
+                        or cur_section.get_lowest_student().section_score
+                        < cur_section.score_student(cur_student)
                     ):
                         is_rogue = True
                 else:

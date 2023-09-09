@@ -17,8 +17,14 @@ def generate_y(x, sections, trials):
         student_dict = data.generate_students_weighted(sections, x)
         for key in student_dict:
             student_dict[key].find_conflicts(sections)
-        student_dict, section_dict = GaleShapley.Gale_Shapley(student_dict, section_dict)
-        num_rogues = len(test_stability.is_pairwise_stable(student_dict=student_dict, section_dict=section_dict)[1])
+        student_dict, section_dict = GaleShapley.Gale_Shapley(
+            student_dict, section_dict
+        )
+        num_rogues = len(
+            test_stability.is_pairwise_stable(
+                student_dict=student_dict, section_dict=section_dict
+            )[1]
+        )
         total_rogues += num_rogues
     return total_rogues / trials
 

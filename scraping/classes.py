@@ -119,7 +119,9 @@ def parse_data(fetched_content: bytes) -> Dict[str, Dict]:
     with open("soup.txt", "w") as f:
         f.write(soup.text)
 
-    raw_classes = soup.find("table", {"class": "bwckschd"}).findAll("td", {"class": "bwckschd_det"})
+    raw_classes = soup.find("table", {"class": "bwckschd"}).findAll(
+        "td", {"class": "bwckschd_det"}
+    )
     parsed_classes = [raw_classes[i : i + 19] for i in range(0, len(raw_classes), 19)]
 
     classes = {}
@@ -130,8 +132,14 @@ def parse_data(fetched_content: bytes) -> Dict[str, Dict]:
             "code": cls[2].string.strip(),
             "section": cls[3].string.strip(),
             "name": " ".join(cls[6].string.strip().split()),
-            "days": cls[8].get_text(separator=date_time_separator).strip().split(date_time_separator),
-            "time": cls[9].get_text(separator=date_time_separator).strip().split(date_time_separator),
+            "days": cls[8]
+            .get_text(separator=date_time_separator)
+            .strip()
+            .split(date_time_separator),
+            "time": cls[9]
+            .get_text(separator=date_time_separator)
+            .strip()
+            .split(date_time_separator),
             "instructor": cls[-1].string.strip() if cls[-1].string else None,
             "credits": cls[4].string.strip(),
             "attrs": cls[7].string.strip(),

@@ -17,7 +17,9 @@ def student_csv_to_df(student_filepath: str) -> pd.DataFrame:
 def student_df_to_dict(student_df: pd.DataFrame) -> dict:
     student_dict = {}
     for index, row in student_df.iterrows():
-        new_student = Student(id=index, name=row[0], base_score=int(row[1]), major=row[2])
+        new_student = Student(
+            id=index, name=row[0], base_score=int(row[1]), major=row[2]
+        )
         new_student.set_section_ranking(row[3].split(" "))
         student_dict[new_student.id] = new_student
     return student_dict

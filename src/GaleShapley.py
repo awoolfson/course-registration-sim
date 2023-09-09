@@ -4,7 +4,7 @@ from CourseSection import CourseSection
 from Student import Student
 
 
-def Gale_Shapley(student_dict, section_dict):
+def Gale_Shapley(student_dict: dict, section_dict: dict) -> (dict, dict):
 
     print("\nstarting Gale-Shapley\n")
 
@@ -15,9 +15,7 @@ def Gale_Shapley(student_dict, section_dict):
 
     # look at last student in free list
     while len(free_students) > 0:
-        to_pop = (
-            True  # this determines if a student has been swapped out and a pop on the free student list is not needed
-        )
+        to_pop = True  # this determines if a student has been swapped out and a pop on the free student list is not needed
         cur_student = student_dict[free_students[-1]]
 
         # while student has more sections to propose to
@@ -31,7 +29,10 @@ def Gale_Shapley(student_dict, section_dict):
                 new_agents = add_student_to_section(cur_student, proposed_section)
                 cur_student, proposed_section = new_agents[0], new_agents[1]
             else:
-                if proposed_section.score_student(cur_student) > proposed_section.get_lowest_student().section_score:
+                if (
+                    proposed_section.score_student(cur_student)
+                    > proposed_section.get_lowest_student().section_score
+                ):
                     removed_student = proposed_section.pop_lowest_student()
                     to_pop = False
                     new_agents = add_student_to_section(cur_student, proposed_section)
@@ -55,7 +56,9 @@ def Gale_Shapley(student_dict, section_dict):
     return (student_dict, section_dict)
 
 
-def add_student_to_section(student: Student, section: CourseSection):
+def add_student_to_section(
+    student: Student, section: CourseSection
+) -> (Student, CourseSection):
     student.join_section(section)
     section.enroll(student)
     return student, section
@@ -84,7 +87,9 @@ def main():
         for key in section_dict:
             print(section_dict[key])
 
-        is_stable, rogues = test_stability.is_pairwise_stable(student_dict, section_dict)
+        is_stable, rogues = test_stability.is_pairwise_stable(
+            student_dict, section_dict
+        )
         if is_stable:
             print("Gale-Shapley is pairwise stable")
         else:

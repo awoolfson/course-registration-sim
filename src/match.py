@@ -34,7 +34,9 @@ def try_enrolling(student: Student, section: CourseSection):
         return student, section
     elif section.is_full():
         if section.score_student(student) > section.get_lowest_student().section_score:
-            removed_student = section.pop_lowest_student()  # currently does nothing, try new addition to removed dict?
+            removed_student = (
+                section.pop_lowest_student()
+            )  # currently does nothing, try new addition to removed dict?
             section.swapped_out = (True, removed_student.id)
             print(
                 f"student {removed_student.name} swapped out for {student.name}\n in section: {section.course_code}: {section.id}\n\n"
@@ -73,9 +75,7 @@ def Gale_Shapley():
     # look at last student in free list
 
     while len(free_students) > 0:
-        to_pop = (
-            True  # this determines if a student has been swapped out and a pop on the free student list is not needed
-        )
+        to_pop = True  # this determines if a student has been swapped out and a pop on the free student list is not needed
         cur_student = student_dict[free_students[-1]]
 
         # while student has more sections to propose to
@@ -106,7 +106,9 @@ def Gale_Shapley():
                 swapped_student = student_dict[proposed_section_new.swapped_out[1]]
                 swapped_student.leave_section(proposed_section_new)
                 student_dict[swapped_student.id] = swapped_student
-                free_students.append(swapped_student.id)  # it should be fine anyway if this is duplicate?
+                free_students.append(
+                    swapped_student.id
+                )  # it should be fine anyway if this is duplicate?
                 cur_student = cur_student_new
                 break  # break so the swapped student can start proposing
 
@@ -126,7 +128,9 @@ def main():
 
         student_dict = data.student_csv_to_dict("../test_data/test_students_2.csv")
 
-        section_dict = data.section_csv_to_dict("../test_data/test_sections_2_rogue.csv")
+        section_dict = data.section_csv_to_dict(
+            "../test_data/test_sections_2_rogue.csv"
+        )
 
         # section_dict = data.section_JSON_to_dict("../scraping/classes.json")
         # student_dict = data.generate_students_weighted(section_dict, 500)
@@ -165,7 +169,9 @@ def main():
         for key in section_dict:
             print(section_dict[key])
 
-        is_pairwise_stable = test_stability.is_pairwise_stable(student_dict=student_dict, section_dict=section_dict)
+        is_pairwise_stable = test_stability.is_pairwise_stable(
+            student_dict=student_dict, section_dict=section_dict
+        )
         print(is_pairwise_stable)
 
 
