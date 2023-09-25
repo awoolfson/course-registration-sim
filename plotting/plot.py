@@ -59,8 +59,10 @@ def main():
     
     trials = 1
 
-    for x in reversed(x_values):
+    for x in x_values:
         y_values.append(generate_y(x, sections, trials))
+        if x == 3000:
+            print(y_values[-1])
 
     plt.xlabel("Number of Students")
     plt.ylabel(f"Average Rogue Pairs Over {trials} Trials")

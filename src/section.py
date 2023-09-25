@@ -3,7 +3,6 @@ import heapq
 from student import Student
 from schedule import Schedule
 
-
 class CourseSection:
     def __init__(
         self,

@@ -1,6 +1,4 @@
 import random
-
-from section import CourseSection
 from typing import Optional
 
 class Student:
@@ -58,11 +56,11 @@ class Student:
         return True
 
     # join and leave section are to be used in conjunction with try_enrolling and try_enrolling_next_section
-    def join_section(self, section: CourseSection):
+    def join_section(self, section):
         self.sections_enrolled += 1
         self.enrolled_in.append(section.id)
 
-    def leave_section(self, section: CourseSection):
+    def leave_section(self, section):
         if section.id in self.enrolled_in:
             self.enrolled_in.remove(section.id)
             self.sections_enrolled -= 1

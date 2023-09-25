@@ -1,11 +1,15 @@
+import random
+
 import data
 from section import CourseSection
 from student import Student
 
+seed = random.randrange(0, 1000)
+
 def gale_shapley_match(student_dict: dict, 
                  section_dict: dict, 
-                 shuffle: bool = False
-                 ) -> (dict, dict):
+                 shuffle: bool = False,
+                 seed: int = seed) -> (dict, dict):
 
     # initialize and populate free students list
     free_students = []
@@ -13,7 +17,7 @@ def gale_shapley_match(student_dict: dict,
         free_students.append(id)
         
     if shuffle:
-        import random
+        random.seed(seed)
         random.shuffle(free_students)
 
     # look at last student in free list
