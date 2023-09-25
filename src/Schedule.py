@@ -50,13 +50,11 @@ class Schedule:
 
     def __eq__(self, other):
         # only tests if schedules conflict, aren't fully equal
-        # print("testing for conflicts between schedules")
         for day in self.day_dict:
             if day != "TBA":
                 time = self.day_dict[day]
                 other_time = other.day_dict[day]
                 if time != () and other_time != ():
-                    # print(time, other_time)
                     if not (time[0] > other_time[1] or time[1] < other_time[0]):
                         return True  # there is a conflict
         return False  # no conflict

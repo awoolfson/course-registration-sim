@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 sys.path.append("../src")
 
 import data
-import GaleShapley
+import gs
 import test_stability
 
 
@@ -17,7 +17,7 @@ def generate_y(x, sections, trials):
         student_dict = data.generate_students_weighted(sections, x)
         for key in student_dict:
             student_dict[key].find_conflicts(sections)
-        student_dict, section_dict = GaleShapley.gale_shapley_match(
+        student_dict, section_dict = gs.gale_shapley_match(
             student_dict, section_dict
         )
         num_rogues = len(
@@ -59,7 +59,7 @@ def main():
     
     trials = 1
 
-    for x in x_values:
+    for x in reversed(x_values):
         y_values.append(generate_y(x, sections, trials))
 
     plt.xlabel("Number of Students")

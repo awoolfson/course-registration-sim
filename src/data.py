@@ -3,8 +3,8 @@ import random
 
 import pandas as pd
 
-from CourseSection import CourseSection
-from Student import Student
+from section import CourseSection
+from student import Student
 
 
 # helper methods first

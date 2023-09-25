@@ -1,9 +1,7 @@
 import heapq
 
-import pandas as pd
-
-import Student
-from Schedule import Schedule
+from student import Student
+from schedule import Schedule
 
 
 class CourseSection:
