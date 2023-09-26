@@ -3,39 +3,41 @@ import random
 
 import pandas as pd
 
-from CourseSection import CourseSection
-from Student import Student
+from section import CourseSection
+from student import Student
 
 
 # helper methods first
-def student_csv_to_df(student_filepath):
+def student_csv_to_df(student_filepath: str) -> pd.DataFrame:
     student_df = pd.read_csv(student_filepath, delimiter=",")
     student_df.set_index("id", inplace=True)
     return student_df
 
 
-def student_df_to_dict(student_df):
+def student_df_to_dict(student_df: pd.DataFrame) -> dict:
     student_dict = {}
     for index, row in student_df.iterrows():
-        new_student = Student(id=index, name=row[0], base_score=int(row[1]), major=row[2])
+        new_student = Student(
+            id=index, name=row[0], base_score=int(row[1]), major=row[2]
+        )
         new_student.set_section_ranking(row[3].split(" "))
         student_dict[new_student.id] = new_student
     return student_dict
 
 
-def student_csv_to_dict(student_filepath):
+def student_csv_to_dict(student_filepath: str) -> dict:
     student_df = student_csv_to_df(student_filepath)
     student_dict = student_df_to_dict(student_df)
     return student_dict
 
 
-def section_csv_to_df(section_filepath):
+def section_csv_to_df(section_filepath: str) -> pd.DataFrame:
     section_df = pd.read_csv(section_filepath)
     section_df.set_index("id", inplace=True)
     return section_df
 
 
-def section_df_to_dict(section_df):
+def section_df_to_dict(section_df: pd.DataFrame) -> dict:
     section_dict = {}
     for index, row in section_df.iterrows():
         new_section = CourseSection(
@@ -52,13 +54,13 @@ def section_df_to_dict(section_df):
     return section_dict
 
 
-def section_csv_to_dict(section_filepath):
+def section_csv_to_dict(section_filepath: str) -> dict:
     section_df = section_csv_to_df(section_filepath)
     section_dict = section_df_to_dict(section_df)
     return section_dict
 
 
-def section_JSON_to_dict(filepath):
+def section_JSON_to_dict(filepath: str) -> dict:
     with open(filepath, "r") as f:
         raw_sections = json.loads(f.read())
     section_dict = {}
@@ -78,13 +80,13 @@ def section_JSON_to_dict(filepath):
     return section_dict
 
 
-def remove_TBAs(section_dict) -> dict:
+def remove_TBAs(section_dict: dict) -> dict:
     for crn in section_dict:
         if section_dict[crn].days == ["TBA"] or section_dict[crn].times == ["TBA"]:
             section_dict.pop(crn)
 
 
-def generate_students_weighted(section_dict, n):
+def generate_students_weighted(section_dict: dict, n: int) -> dict:
     depts = []
     crns = []
     student_dict = {}
@@ -129,10 +131,10 @@ def generate_students_weighted(section_dict, n):
     return student_dict
 
 
-# heavy duyy methods
+# high level methods
 
 
-def all_from_csv(student_filepath, section_filepath):
+def all_from_csv(student_filepath: str, section_filepath: str) -> tuple:
     student_dict = student_csv_to_dict(student_filepath)
     section_dict = section_csv_to_dict(section_filepath)
     for key in student_dict:
@@ -140,7 +142,7 @@ def all_from_csv(student_filepath, section_filepath):
     return student_dict, section_dict
 
 
-def all_from_JSON_with_generation(filepath, n):
+def all_from_JSON_with_generation(filepath: str, n: int) -> tuple:
     section_dict = section_JSON_to_dict(filepath)
     student_dict = generate_students_weighted(section_dict, n)
     for key in student_dict:
