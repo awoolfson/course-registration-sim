@@ -41,7 +41,7 @@ class Student:
             ranking[i] = int(section_id)
         self.section_ranking = ranking
         for id in self.section_ranking:
-            self.conflicts_dict[id] = []
+            self.conflicts_dict[id] = set()
 
     def can_propose(self) -> bool:
         if self.get_top_section_id() == None:
@@ -62,12 +62,14 @@ class Student:
     def get_top_section_id(self) -> Optional[int]:
         for i in range(0, len(self.section_ranking)):
             section_id = self.section_ranking[i]
-            does_conflict = False
-            for c in self.conflicts_dict[section_id]:
-                if c in self.enrolled_in:
-                    does_conflict = True
-            if section_id not in self.proposed_to and not does_conflict:
-                return section_id
+            if section_id not in self.proposed_to:
+                conflict = False
+                for c in self.conflicts_dict[section_id]:
+                    if c in self.enrolled_in:
+                        conflict = True
+                        break
+                if not conflict:
+                    return section_id
         return None
 
     def add_proposal(self, section_id: int):
@@ -81,8 +83,8 @@ class Student:
     def find_conflicts(self, section_dict: dict):
         for id in self.section_ranking:
             cur_section = section_dict[id]
-            self.conflicts_dict[id] = []
+            self.conflicts_dict[id] = set()
             for other_id in self.section_ranking:
                 other_section = section_dict[other_id]
                 if other_id != id and other_section.schedule == cur_section.schedule:
-                    self.conflicts_dict[id].append(other_section.id)
+                    self.conflicts_dict[id].add(other_section.id)

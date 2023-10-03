@@ -14,7 +14,7 @@ def is_weakly_stable(student_dict: dict, section_dict: dict) -> (bool, list):
         cur_student = student_dict[key]
         student_rogues = []
         preferred_sections = []
-        remaining_enrolled_sections = list(cur_student.enrolled_in)
+        remaining_enrolled_sections = cur_student.section_limit
 
         for section_id in cur_student.section_ranking:
             is_rogue = False
@@ -36,8 +36,8 @@ def is_weakly_stable(student_dict: dict, section_dict: dict) -> (bool, list):
                     ):
                         is_rogue = False
             else:
-                remaining_enrolled_sections.remove(section_id)
-                if remaining_enrolled_sections == []:
+                remaining_enrolled_sections -= 1
+                if remaining_enrolled_sections == 0:
                     break
 
             if is_rogue:
