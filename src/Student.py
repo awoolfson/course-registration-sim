@@ -9,9 +9,8 @@ class Student:
         self.base_score = base_score # can add random int to eliminate ties
         self.name = name
         self.section_ranking = []
-        self.enrolled_in = []
+        self.enrolled_in = set()
         self.sections_enrolled = 0
-        self.section_score = None  # compare students within a section, should not be saved to a database ever
         self.next_section_index = 0
 
         self.conflicts_dict = (

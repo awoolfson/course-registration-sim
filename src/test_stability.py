@@ -24,7 +24,7 @@ def is_weakly_stable(student_dict: dict, section_dict: dict) -> (bool, list):
             if not section_id in cur_student.enrolled_in:
                 if (
                     not cur_section.is_full()
-                    or cur_section.get_lowest_student().section_score
+                    or cur_section.get_lowest_student()[0]
                     < cur_section.score_student(cur_student)
                 ):
                     is_rogue = True

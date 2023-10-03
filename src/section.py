@@ -57,8 +57,7 @@ class CourseSection:
         return popped_student
 
     def get_lowest_student(self) -> Student:
-        lowest_student = heapq.heappop(self.roster_pq)
-        heapq.heappush(self.roster_pq, lowest_student)
+        lowest_student = heapq.nsmallest(1, self.roster_pq)[0]
         return lowest_student
 
     def is_full(self) -> bool:
@@ -69,4 +68,4 @@ class CourseSection:
 
     def enroll(self, student: Student):
         student.section_score = self.score_student(student)
-        heapq.heappush(self.roster_pq, student)
+        heapq.heappush(self.roster_pq, (student.section_score, student.id))

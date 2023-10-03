@@ -34,18 +34,14 @@ def gale_shapley_match(student_dict: dict,
 
             if not proposed_section.is_full():
                 add_student_to_section(cur_student, proposed_section)
-            else:
-                if (
+            elif (
                     proposed_section.score_student(cur_student)
-                    > proposed_section.get_lowest_student().section_score
+                    > proposed_section.get_lowest_student()[0]
                 ):
-                    removed_student = proposed_section.pop_lowest_student()
+                    removed_student_id = proposed_section.pop_lowest_student()[1]
+                    removed_student = student_dict[removed_student_id]
                     to_pop = False
                     add_student_to_section(cur_student, proposed_section)
-
-            # update dictionaries with returned student and section objects
-            student_dict[cur_student.id] = cur_student
-            section_dict[proposed_section.id] = proposed_section
 
             # if a student in the section has been replaced
             if to_pop == False:
