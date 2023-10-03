@@ -6,9 +6,7 @@ class Student:
         self.id = id  # 8 digit ID
         self.major = major
         self.section_limit = 4
-        self.base_score = base_score + random.randrange(
-            0, 100
-        )  # this exists to eliminate ties
+        self.base_score = base_score # can add random int to eliminate ties
         self.name = name
         self.section_ranking = []
         self.enrolled_in = []
