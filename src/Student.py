@@ -1,4 +1,3 @@
-import random
 from typing import Optional
 
 class Student:
@@ -10,7 +9,6 @@ class Student:
         self.name = name
         self.section_ranking = []
         self.enrolled_in = set()
-        self.next_section_index = 0
 
         self.conflicts_dict = (
             {}
@@ -24,16 +22,6 @@ class Student:
             f"section ranking: {self.section_ranking}\nschedule: {self.enrolled_in}\nsections enrolled: {len(self.enrolled_in)}\n"
         )
         return string
-
-    # for sorting students by section score
-    def __lt__(self, other_student):
-        return self.section_score < other_student.section_score
-
-    def __eq__(self, other_student):
-        return self.section_score == other_student.section_score
-
-    def __gt__(self, other_student):
-        return self.section_score > other_student.section_score
 
     # sets section ranking for the student, also populates conflicts_dict and proposed_dict
     def set_section_ranking(self, ranking: list):

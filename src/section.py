@@ -47,7 +47,7 @@ class CourseSection:
         else:
             mod = 0
             if student.major == self.dept:
-                mod = 50
+                mod = 50 
             score = student.base_score + mod
             self.student_section_scores[id] = score
             return score
@@ -67,5 +67,5 @@ class CourseSection:
         return len(self.roster_pq) == 0
 
     def enroll(self, student: Student):
-        student.section_score = self.score_student(student)
-        heapq.heappush(self.roster_pq, (student.section_score, student.id))
+        section_score = self.score_student(student)
+        heapq.heappush(self.roster_pq, (section_score, student.id))
