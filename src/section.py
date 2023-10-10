@@ -33,7 +33,7 @@ class CourseSection:
     def __str__(self):
         roster = []
         for s in self.roster_pq:
-            roster.append(s.id)
+            roster.append(s[1])
         string = (
             f"{self.dept}{self.course_code}: {self.course_name}\nid: {self.id}\ncapacity: {self.capacity}\n"
             f"credits: {self.credits}\nroster: {roster}\nschedule: {self.schedule}\n"
