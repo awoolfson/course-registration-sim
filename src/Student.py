@@ -1,7 +1,7 @@
 from typing import Optional
 
 class Student:
-    def __init__(self, id: int, name: str, base_score: int, major: str):
+    def __init__(self, id: int, name: str, base_score: int, major: str, **kwargs):
         self.id = id  # 8 digit ID
         self.major = major
         self.section_limit = 4
@@ -15,6 +15,8 @@ class Student:
         )  # entries take the form {section_id: [conflict_index, conflict_index, ...]}
 
         self.proposed_to = set()  # entries take the form {section_id: True/False}
+        
+        self.info = kwargs
 
     def __str__(self):
         string = (
