@@ -31,7 +31,7 @@ It also prevents students who are very far behind from being prioritized over st
 import sys
 from pprint import pprint
 
-sys.path.append("src")
+sys.path.append("../src")
 
 import data
 
@@ -39,11 +39,9 @@ from gs import gale_shapley_match
 from test_stability import is_weakly_stable
 from student import Student
 
-sys.path.append("/..")
+sections = data.section_csv_to_dict("cs_courses_spring24.csv")
 
-sections = data.section_csv_to_dict("CsCoursesSpring24.csv")
-
-student_df = data.student_csv_to_df("Students.csv")
+student_df = data.student_csv_to_df("google_form_students.csv")
 students = {}
 
 for index, row in student_df.iterrows():
