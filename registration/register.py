@@ -30,28 +30,30 @@ It also prevents students who are very far behind from being prioritized over st
 
 import sys
 from pprint import pprint
+import re
+import pandas as pd
 
 sys.path.append("../src")
 
-import data
+from data import section_csv_to_dict
 
 from gs import gale_shapley_match
 from test_stability import is_weakly_stable
 from student import Student
 
-sections = data.section_csv_to_dict("cs_courses_spring24.csv")
+sections = section_csv_to_dict("cs_courses_spring24.csv")
 
-student_df = data.student_csv_to_df("google_form_students.csv")
+response_df =  pd.read_csv("google_form_students.csv")
 students = {}
 
-for index, row in student_df.iterrows():
+for index, row in response_df.iterrows():
     
     # score for student
     base_score = 0
     
     # majors are prioritized over minors, scores are slightly adjusted based on whether they have declared
     taken_courses = row[4]
-    taken_courses = taken_courses.split(" ")
+    taken_courses = taken_courses.split(",")
     taken_count = len(taken_courses)
     major = row[3]
     
@@ -91,12 +93,37 @@ for index, row in student_df.iterrows():
     courses_needed = min(courses_needed, 4)
     base_score += courses_needed * 100
     
-    section_limit = max(int(row[19]), 4)
+    section_limit = max(int(row[20]), 4)
+    
+    crns = {
+        #"212-1": 10324,
+        #"212-2": 10325,
+        "219-1": 10746,
+        "302-1": 10326,
+        "303-1": 10327,
+        "304-1": 10328,
+        "307-1": 10329,
+        "310-1": 10330,
+        "313-1": 10331,
+        "315-1": 10332,
+        "350-1": 10333,
+        "496-1": 10334,
+        "496-2": 10335,
+        } # include course label to CRN matching here
+    
+    pattern = "([0-9]{3}-[0-9]{1})"
+    ranking = []
+    for i in range(6, 20):
+        number = re.match(pattern, row[i])
+        number = number.group(1)
+        if crn := crns.get(number, None):
+            ranking.append(crn)
         
     new_student = Student(
         id=row[2], name=row[1], major="NA", base_score=base_score,
     )
 
+    new_student.set_section_ranking(ranking)
     new_student.section_limit = section_limit
     # set section ranking: ADD CRN TO SURVEY
 
@@ -105,4 +132,6 @@ for index, row in student_df.iterrows():
 gale_shapley_match(students, sections)
 for section in sections.values():
     print(section)
+for student in students.values():
+    print(student)
 print(is_weakly_stable(students, sections))
