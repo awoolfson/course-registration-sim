@@ -74,7 +74,7 @@ for index, row in response_df.iterrows():
     grad_semester = row[5]
     if grad_semester == "Spring 2024":
         courses_needed = courses_left
-        base_score += 1250
+        base_score += 650 if courses_needed == 0 else 50
     elif grad_semester == "Fall 2024":
         courses_needed = courses_left - 2
         base_score += 40
@@ -90,23 +90,23 @@ for index, row in response_df.iterrows():
     
     # students who are ahead will be prioritized the same
     courses_needed = max(courses_needed, 0)
-    courses_needed = min(courses_needed, 4)
+    # courses_needed = min(courses_needed, 4)
     base_score += courses_needed * 100
     
-    section_limit = max(int(row[20]), 4)
+    desired = min(int(row[20]), courses_needed)
+    section_limit = min(desired, 4)
     
     crns = {
-        #"212-1": 10324,
-        #"212-2": 10325,
+        "212-1": 10324,
+        "212-2": 10325,
         "219-1": 10746,
         "302-1": 10326,
         "303-1": 10327,
         "304-1": 10328,
-        "307-1": 10329,
         "310-1": 10330,
         "313-1": 10331,
         "315-1": 10332,
-        "350-1": 10333,
+        "428-1": 10813,
         "496-1": 10334,
         "496-2": 10335,
         } # include course label to CRN matching here
