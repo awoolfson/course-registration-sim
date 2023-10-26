@@ -44,6 +44,7 @@ from student import Student
 sections = section_csv_to_dict("cs_courses_spring24.csv")
 
 response_df =  pd.read_csv("google_form_students.csv")
+print(response_df)
 students = {}
 
 for index, row in response_df.iterrows():
@@ -55,15 +56,15 @@ for index, row in response_df.iterrows():
     taken_courses = row[4]
     taken_courses = taken_courses.split(",")
     taken_count = len(taken_courses)
-    major = row[3]
+    status = row[3]
     
-    if major == "major":
+    if status == "declared CS major":
         base_score = 1000
-        courses_left = 13 - taken_count
-    elif major == "intended major":
+        courses_left = 12 - taken_count
+    elif status == "intended CS major":
         base_score = 990
-        courses_left = 13 - taken_count
-    elif major == "minor":
+        courses_left = 12 - taken_count
+    elif status == "CS minor":
         base_score = 10
         courses_left = 5 - taken_count
     else: # none of the above
@@ -73,28 +74,47 @@ for index, row in response_df.iterrows():
     # scores mainly based on number of courses needed to be "on track" (2 courses left per semester)
     grad_semester = row[5]
     if grad_semester == "Spring 2024":
-        courses_needed = courses_left
-        base_score += 650 if courses_needed == 0 else 50
+        courses_needed_soft = courses_left
+        courses_needed_hard = courses_left
+        base_score += 80
+        # if status == "minor" and courses_needed_hard == 1:
+        #     base_score += 900
     elif grad_semester == "Fall 2024":
-        courses_needed = courses_left - 2
-        base_score += 40
+        courses_needed_soft = courses_left - 2
+        courses_needed_hard = courses_left - 4
+        base_score += 70
     elif grad_semester == "Spring 2025":
-        courses_needed = courses_left - 4
-        base_score += 30
+        courses_needed_soft = courses_left - 4
+        courses_needed_hard = courses_left - 8
+        base_score += 60
     elif grad_semester == "Fall 2025":
-        courses_needed = courses_left - 6
-        base_score += 20
+        courses_needed_soft = courses_left - 6
+        courses_needed_hard = courses_left - 12
+        base_score += 50
     elif grad_semester == "Spring 2026":
-        courses_needed = courses_left - 8
+        courses_needed_soft = courses_left - 8
+        courses_needed_hard = courses_left - 16
+        base_score += 40
+    elif grad_semester == "Fall 2026":
+        courses_needed_soft = courses_left - 10
+        courses_needed_hard = courses_left - 20
+        base_score += 30
+    elif grad_semester == "Spring 2027":
+        courses_needed_soft = courses_left - 12
+        courses_needed_hard = courses_left - 24
+        base_score += 20
+    elif grad_semester == "Fall 2027":
+        courses_needed_soft = courses_left - 14
+        courses_needed_hard = courses_left - 28
         base_score += 10
     
     # students who are ahead will be prioritized the same
-    courses_needed = max(courses_needed, 0)
+    courses_needed_soft = max(courses_needed_soft, 0)
+    courses_needed_hard = max(courses_needed_hard, 0)
     # courses_needed = min(courses_needed, 4)
-    base_score += courses_needed * 100
+    # base_score += courses_needed_soft * 100
     
-    desired = min(int(row[20]), courses_needed)
-    section_limit = min(desired, 4)
+    section_limit = min(courses_needed_soft, row[19], 4)
     
     crns = {
         "212-1": 10324,
@@ -109,15 +129,16 @@ for index, row in response_df.iterrows():
         "428-1": 10813,
         "496-1": 10334,
         "496-2": 10335,
-        } # include course label to CRN matching here
+        }
     
     pattern = "([0-9]{3}-[0-9]{1})"
     ranking = []
-    for i in range(6, 20):
-        number = re.match(pattern, row[i])
-        number = number.group(1)
-        if crn := crns.get(number, None):
-            ranking.append(crn)
+    for i in range(6, 18):
+        if type(row[i]) == str:
+            number = re.match(pattern, row[i])
+            number = number.group(1)
+            if crn := crns.get(number, None):
+                ranking.append(crn)
         
     new_student = Student(
         id=row[2], name=row[1], major="NA", base_score=base_score,
@@ -128,6 +149,8 @@ for index, row in response_df.iterrows():
     # set section ranking: ADD CRN TO SURVEY
 
     students[new_student.id] = new_student
+
+# add extra allocation of seats here
 
 gale_shapley_match(students, sections)
 for section in sections.values():
