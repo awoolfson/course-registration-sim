@@ -131,6 +131,7 @@ for index, row in response_df.iterrows():
             "courses_needed_hard": courses_needed_hard,
             "courses_desired": row[19],
             "grad_semester": grad_semester,
+            "max_seats": min(4, len(ranking), row[19]),
             }
     )
 
@@ -140,6 +141,8 @@ for index, row in response_df.iterrows():
     students[new_student.id] = new_student
 
 prev_remaining_seats = remaining_seats
+sorted_students = sorted(students.values(), key=lambda x: x.base_score, reverse=True)
+iteration = 0
 while remaining_seats > 0:
     print("looping", remaining_seats)
     
@@ -149,14 +152,14 @@ while remaining_seats > 0:
         student.info["grad_semester"] == "Spring 2024" and \
         student.info["courses_needed_hard"] == 1 and \
         student.section_limit < 1 and \
-        student.section_limit < len(student.section_ranking) and \
+        student.section_limit < student.info["max_seats"] and \
         remaining_seats > 0:
             student.section_limit += 1
             remaining_seats -= 1
 
     # tier 3: minors who need one last course
     for student in students.values():
-        if student.section_limit == 0 and student.major == "major" and student.section_limit < 4 and remaining_seats > 0 and \
+        if student.section_limit == 0 and student.major == "major" and student.info["max_seats"] > student.section_limit and remaining_seats > 0 and \
         student.section_limit < len(student.section_ranking):
             student.section_limit += 1
             remaining_seats -= 1
@@ -164,10 +167,8 @@ while remaining_seats > 0:
     # tier 4: graduating majors who want an extra course
     for student in students.values():
         if student.info["grad_semester"] == "Spring 2024" and \
-        student.info["courses_desired"] > student.section_limit and \
+        student.info["max_seats"] > student.section_limit and \
         student.major == "major" and \
-        student.section_limit < 4 and \
-        student.section_limit < len(student.section_ranking) and \
         remaining_seats > 0:
             student.section_limit += 1
             remaining_seats -= 1
@@ -175,20 +176,15 @@ while remaining_seats > 0:
     # tier 5: intended majors needs
     for student in students.values():
         if student.major == "intended":
-            while min(student.info["courses_needed_soft"], student.info["courses_desired"]) > student.section_limit and \
-            student.section_limit < 4 and \
-            student.section_limit < len(student.section_ranking) and \
-            remaining_seats > 0:
+            while student.info["max_seats"] > student.section_limit and remaining_seats > 0:
                 student.section_limit += 1
                 remaining_seats -= 1
             
     # tier 6: non seniro majors who want an extra course
     for student in students.values():
         if student.info["grad_semester"] != "Spring 2024" and \
-        student.info["courses_desired"] > student.section_limit and \
         student.major == "major" and \
-        student.section_limit < 4 and \
-        student.section_limit < len(student.section_ranking) and \
+        student.info["max_seats"] > student.section_limit and \
         remaining_seats > 0:
             student.section_limit += 1
             remaining_seats -= 1
@@ -196,23 +192,23 @@ while remaining_seats > 0:
     # tier 7: all minors who want an extra course
     for student in students.values():
         if student.major == "minor" and \
-        student.info["courses_desired"] > student.section_limit and \
-        student.section_limit < 4 and \
-        student.section_limit < len(student.section_ranking) and \
+        student.info["max_seats"] > student.section_limit and \
         remaining_seats > 0:
             student.section_limit += 1
             remaining_seats -= 1
             
     # tier 8: other
     for student in students.values():
-        if student.section_limit == 0 and \
+        if student.section_limit <= iteration and \
+        student.info["max_seats"] > student.section_limit and \
         remaining_seats > 0:
             student.section_limit += 1
-            remaining_seats -= 1 
+            remaining_seats -= 1
             
     if prev_remaining_seats == remaining_seats:
         break
     prev_remaining_seats = remaining_seats
+    iteration += 1
             
 print(sum(map(lambda x: x.section_limit, students.values())))
 for student in students.values():
