@@ -203,6 +203,13 @@ while remaining_seats > 0:
             student.section_limit += 1
             remaining_seats -= 1
             
+    # tier 8: other
+    for student in students.values():
+        if student.section_limit == 0 and \
+        remaining_seats > 0:
+            student.section_limit += 1
+            remaining_seats -= 1 
+            
     if prev_remaining_seats == remaining_seats:
         break
     prev_remaining_seats = remaining_seats
