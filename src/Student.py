@@ -1,14 +1,15 @@
 from typing import Optional
 
 class Student:
-    def __init__(self, id: int, name: str, base_score: int, major: str, **kwargs):
+    def __init__(self, id: int, name: str, base_score: int = 0, major: str = "NA", section_limit: int = 4, **kwargs):
         self.id = id  # 8 digit ID
         self.major = major
-        self.section_limit = 4
+        self.section_limit = section_limit
         self.base_score = base_score # can add random int to eliminate ties
         self.name = name
         self.section_ranking = []
         self.enrolled_in = set()
+        self.info = kwargs
 
         self.conflicts_dict = (
             {}

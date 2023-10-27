@@ -17,9 +17,11 @@ def is_weakly_stable(student_dict: dict, section_dict: dict) -> (bool, list):
         remaining_enrolled_sections = cur_student.section_limit
 
         for section_id in cur_student.section_ranking:
+            if cur_student.section_limit == 0:
+                break
             is_rogue = False
             cur_section = section_dict[section_id]
-
+            
             # if fits traditional rogue pair definition
             if not section_id in cur_student.enrolled_in:
                 if (

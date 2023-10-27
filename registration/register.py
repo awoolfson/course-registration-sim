@@ -146,8 +146,8 @@ while remaining_seats > 0:
     # tier 2: majors who haven't gotten any courses
     for student in students.values():
         if student.major == "minor" and \
-        student.kwargs["grad_semester"] == "Spring 2024" and \
-        student.kwargs["courses_needed_hard"] == 1 and \
+        student.info["grad_semester"] == "Spring 2024" and \
+        student.info["courses_needed_hard"] == 1 and \
         student.section_limit < 1 and \
         remaining_seats > 0:
             student.section_limit += 1
@@ -161,8 +161,8 @@ while remaining_seats > 0:
 
     # tier 4: graduating majors who want an extra course
     for student in students.values():
-        if student.kwargs["grad_semester"] == "Spring 2024" and \
-        student.kwargs["courses_desired"] > student.section_limit and \
+        if student.info["grad_semester"] == "Spring 2024" and \
+        student.info["courses_desired"] > student.section_limit and \
         student.major == "major" and \
         student.section_limit < 4 and \
         remaining_seats > 0:
@@ -172,7 +172,7 @@ while remaining_seats > 0:
     # tier 5: intended majors needs
     for student in students.values():
         if student.major == "intended":
-            while min(student.kwargs["courses_needed_soft"], student.kwargs["courses_desired"]) > student.section_limit and \
+            while min(student.info["courses_needed_soft"], student.info["courses_desired"]) > student.section_limit and \
             student.section_limit < 4 and \
             remaining_seats > 0:
                 student.section_limit += 1
@@ -180,8 +180,8 @@ while remaining_seats > 0:
             
     # tier 6: non seniro majors who want an extra course
     for student in students.values():
-        if student.kwargs["grad_semester"] != "Spring 2024" and \
-        student.kwargs["courses_desired"] > student.section_limit and \
+        if student.info["grad_semester"] != "Spring 2024" and \
+        student.info["courses_desired"] > student.section_limit and \
         student.major == "major" and \
         student.section_limit < 4 and \
         remaining_seats > 0:
@@ -191,7 +191,7 @@ while remaining_seats > 0:
     # tier 7: all minors who want an extra course
     for student in students.values():
         if student.major == "minor" and \
-        student.kwargs["courses_desired"] > student.section_limit and \
+        student.info["courses_desired"] > student.section_limit and \
         student.section_limit < 4 and \
         remaining_seats > 0:
             student.section_limit += 1

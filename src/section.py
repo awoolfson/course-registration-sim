@@ -45,12 +45,7 @@ class CourseSection:
         if id in self.student_section_scores:
             return self.student_section_scores[id]
         else:
-            mod = 0
-            if student.major == self.dept:
-                mod = 50 
-            score = student.base_score + mod
-            self.student_section_scores[id] = score
-            return score
+            return student.base_score
 
     def pop_lowest_student(self) -> Student:
         popped_student = heapq.heappop(self.roster_pq)
