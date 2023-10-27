@@ -96,10 +96,6 @@ for index, row in response_df.iterrows():
     # courses_needed = min(courses_needed, 4)
     # base_score += courses_needed_soft * 100
     
-    # tier 1: majors needs
-    section_limit = min(courses_needed_soft, row[19], 4) if major == "major" else 0
-    remaining_seats -= section_limit
-    
     crns = {
         "212-1": 10324,
         "212-2": 10325,
@@ -124,6 +120,10 @@ for index, row in response_df.iterrows():
             if crn := crns.get(number, None):
                 ranking.append(crn)
         
+    # tier 1: majors needs
+    section_limit = min(courses_needed_soft, row[19], 4, len(ranking)) if major == "major" else 0
+    remaining_seats -= section_limit
+    
     new_student = Student(
         id=row[2], name=row[1], major=major, base_score=base_score,
         **{
@@ -136,26 +136,28 @@ for index, row in response_df.iterrows():
 
     new_student.set_section_ranking(ranking)
     new_student.section_limit = section_limit
-    # set section ranking: ADD CRN TO SURVEY
 
     students[new_student.id] = new_student
 
 prev_remaining_seats = remaining_seats
 while remaining_seats > 0:
     print("looping", remaining_seats)
+    
     # tier 2: majors who haven't gotten any courses
     for student in students.values():
         if student.major == "minor" and \
         student.info["grad_semester"] == "Spring 2024" and \
         student.info["courses_needed_hard"] == 1 and \
         student.section_limit < 1 and \
+        student.section_limit < len(student.section_ranking) and \
         remaining_seats > 0:
             student.section_limit += 1
             remaining_seats -= 1
 
     # tier 3: minors who need one last course
     for student in students.values():
-        if student.section_limit == 0 and student.major == "major" and student.section_limit < 4 and remaining_seats > 0:
+        if student.section_limit == 0 and student.major == "major" and student.section_limit < 4 and remaining_seats > 0 and \
+        student.section_limit < len(student.section_ranking):
             student.section_limit += 1
             remaining_seats -= 1
 
@@ -165,6 +167,7 @@ while remaining_seats > 0:
         student.info["courses_desired"] > student.section_limit and \
         student.major == "major" and \
         student.section_limit < 4 and \
+        student.section_limit < len(student.section_ranking) and \
         remaining_seats > 0:
             student.section_limit += 1
             remaining_seats -= 1
@@ -174,6 +177,7 @@ while remaining_seats > 0:
         if student.major == "intended":
             while min(student.info["courses_needed_soft"], student.info["courses_desired"]) > student.section_limit and \
             student.section_limit < 4 and \
+            student.section_limit < len(student.section_ranking) and \
             remaining_seats > 0:
                 student.section_limit += 1
                 remaining_seats -= 1
@@ -184,6 +188,7 @@ while remaining_seats > 0:
         student.info["courses_desired"] > student.section_limit and \
         student.major == "major" and \
         student.section_limit < 4 and \
+        student.section_limit < len(student.section_ranking) and \
         remaining_seats > 0:
             student.section_limit += 1
             remaining_seats -= 1
@@ -193,6 +198,7 @@ while remaining_seats > 0:
         if student.major == "minor" and \
         student.info["courses_desired"] > student.section_limit and \
         student.section_limit < 4 and \
+        student.section_limit < len(student.section_ranking) and \
         remaining_seats > 0:
             student.section_limit += 1
             remaining_seats -= 1
