@@ -1,6 +1,5 @@
 """
 Auden Woolfson, 2023
-
 """
 
 import sys
@@ -30,12 +29,12 @@ for index, row in response_df.iterrows():
     # score for student
     base_score = 0
     
-    # majors are prioritized over minors, scores are slightly adjusted based on whether they have declared
     taken_courses = row[4]
     taken_courses = taken_courses.split(",")
     taken_count = len(taken_courses)
     status = row[3]
     
+    # base score heavily based on major status
     if status == "declared CS major":
         base_score = 3000
         courses_left = 12 - taken_count
@@ -53,14 +52,12 @@ for index, row in response_df.iterrows():
         courses_left = 0
         major = "none"
     
-    # scores mainly based on number of courses needed to be "on track" (2 courses left per semester)
+    # modifiers to base score applied based on seniority
     grad_semester = row[5]
     if grad_semester == "Spring 2024":
         courses_needed_soft = courses_left
         courses_needed_hard = courses_left
         base_score += 80
-        # if status == "minor" and courses_needed_hard == 1:
-        #     base_score += 900
     elif grad_semester == "Fall 2024":
         courses_needed_soft = courses_left - 2
         courses_needed_hard = courses_left - 4
@@ -90,11 +87,8 @@ for index, row in response_df.iterrows():
         courses_needed_hard = courses_left - 28
         base_score += 10
     
-    # students who are ahead will be prioritized the same
     courses_needed_soft = max(courses_needed_soft, 0)
     courses_needed_hard = max(courses_needed_hard, 0)
-    # courses_needed = min(courses_needed, 4)
-    # base_score += courses_needed_soft * 100
     
     crns = {
         "212-1": 10324,
@@ -113,7 +107,7 @@ for index, row in response_df.iterrows():
     
     pattern = "([0-9]{3}-[0-9]{1})"
     ranking = []
-    for i in range(6, 18):
+    for i in list(range(6, 20)) + [25]:
         if type(row[i]) == str:
             number = re.match(pattern, row[i])
             number = number.group(1)
@@ -121,7 +115,7 @@ for index, row in response_df.iterrows():
                 ranking.append(crn)
         
     # tier 1: majors needs
-    section_limit = min(courses_needed_soft, row[19], 4, len(ranking)) if major == "major" else 0
+    section_limit = min(courses_needed_soft, row[20], 4, len(ranking)) if major == "major" else 0
     remaining_seats -= section_limit
     
     new_student = Student(
@@ -129,16 +123,17 @@ for index, row in response_df.iterrows():
         **{
             "courses_needed_soft": courses_needed_soft,
             "courses_needed_hard": courses_needed_hard,
-            "courses_desired": row[19],
+            "courses_desired": row[20],
             "grad_semester": grad_semester,
-            "max_seats": min(4, len(ranking), row[19]),
+            "max_seats": min(4, len(ranking), row[20]),
             }
     )
 
     new_student.set_section_ranking(ranking)
     new_student.section_limit = section_limit
 
-    students[new_student.id] = new_student
+    if new_student.name != "awoolfson@conncoll.edu":
+        students[new_student.id] = new_student
 
 prev_remaining_seats = remaining_seats
 sorted_students = sorted(students.values(), key=lambda x: x.base_score, reverse=True)
@@ -150,9 +145,8 @@ while remaining_seats > 0:
     for student in students.values():
         if student.major == "minor" and \
         student.info["grad_semester"] == "Spring 2024" and \
-        student.info["courses_needed_hard"] == 1 and \
-        student.section_limit < 1 and \
-        student.section_limit < student.info["max_seats"] and \
+        student.info["max_seats"] > student.section_limit and \
+        student.section_limit == student.info["courses_needed_hard"] - 1 and \
         remaining_seats > 0:
             student.section_limit += 1
             remaining_seats -= 1
@@ -209,8 +203,7 @@ while remaining_seats > 0:
         break
     prev_remaining_seats = remaining_seats
     iteration += 1
-            
-print(sum(map(lambda x: x.section_limit, students.values())))
+
 for student in students.values():
     print(student.section_limit)
             
@@ -220,3 +213,13 @@ for section in sections.values():
 for student in students.values():
     print(student)
 print(is_weakly_stable(students, sections))
+
+total_desired_seats = sum(map(lambda x: x.info["courses_desired"], students.values()))
+total_allocated_seats = sum(map(lambda x: x.section_limit, students.values()))
+total_filled_seats = sum(map(lambda x: len(x.roster_pq), sections.values()))
+total_seats = sum(map(lambda x: x.capacity, sections.values()))
+
+print(f"total desired seats: {total_desired_seats}")
+print(f"total allocated seats: {total_allocated_seats}")
+print(f"total filled seats: {total_filled_seats}")
+print(f"total seats: {total_seats}")
