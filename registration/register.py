@@ -223,8 +223,26 @@ def main():
 
     ids = list(students.keys())
     students = list(students.values())
-    students = list(map(lambda x: [x.name, x.enrolled_in], students))
-    students = pd.DataFrame(students, index=ids, columns=["name", "enrolled_in"])
+    students = list(map(
+        lambda x: [
+            x.name,
+            x.info['courses_desired'],
+            x.info['courses_needed_soft'],
+            x.info['courses_needed_hard'],
+            len(x.enrolled_in),
+            x.enrolled_in
+            ], 
+        students
+        ))
+    students = pd.DataFrame(
+        students, index=ids, columns=[
+            "name",
+            "num_desired",
+            "num_needed_soft",
+            "num_needed_hard",
+            "num_given",
+            "enrolled_in"
+            ])
     students.to_csv("output_students.csv")
 
     crns = list(sections.keys())
