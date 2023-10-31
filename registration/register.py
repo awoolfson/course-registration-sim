@@ -9,7 +9,7 @@ import pandas as pd
 
 sys.path.append("../src")
 
-from data import section_csv_to_dict
+from data_methods import section_csv_to_dict
 
 from gs import gale_shapley_match
 from test_stability import is_weakly_stable
@@ -119,7 +119,7 @@ for index, row in response_df.iterrows():
     remaining_seats -= section_limit
     
     new_student = Student(
-        id=row[2], name=row[1], major=major, base_score=base_score,
+        id = "00" + str(row[2]), name=row[1], major=major, base_score=base_score,
         **{
             "courses_needed_soft": courses_needed_soft,
             "courses_needed_hard": courses_needed_hard,
@@ -153,7 +153,9 @@ while remaining_seats > 0:
 
     # tier 3: minors who need one last course
     for student in students.values():
-        if student.section_limit == 0 and student.major == "major" and student.info["max_seats"] > student.section_limit and remaining_seats > 0 and \
+        if student.section_limit == 0 and student.major == "major" and \
+        student.info["max_seats"] > student.section_limit and \
+        remaining_seats > 0 and \
         student.section_limit < len(student.section_ranking):
             student.section_limit += 1
             remaining_seats -= 1
