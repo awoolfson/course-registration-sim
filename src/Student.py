@@ -1,7 +1,7 @@
 from typing import Optional
 
 class Student:
-    def __init__(self, id: int, name: str, base_score: int = 0, major: str = "NA", section_limit: int = 4, **kwargs):
+    def __init__(self, id: str, name: str, base_score: int = 0, major: str = "NA", section_limit: int = 4, **kwargs):
         self.id = id  # 8 digit ID
         self.major = major
         self.section_limit = section_limit

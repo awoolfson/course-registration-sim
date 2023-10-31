@@ -1,11 +1,11 @@
-import data
+import data_methods
 import test_stability
 import gs
 from count_potential_rogues import count_potential_rogues
                 
 
 def main():
-    student_dict, section_dict = data.all_from_csv(
+    student_dict, section_dict = data_methods.all_from_csv(
         'test_data/test_students_2.csv',
         'test_data/test_sections_2.csv'
     )
@@ -21,7 +21,7 @@ def main():
     if not res[0]:
         print(res[2])
 
-    student_dict, section_dict = data.all_from_csv(
+    student_dict, section_dict = data_methods.all_from_csv(
         'test_data/test_students_2.csv',
         'test_data/test_sections_2_rogue.csv'
     )
@@ -34,8 +34,8 @@ def main():
         print(student)
 
     res = test_stability.is_weakly_stable(student_dict, section_dict)
-    if not res[0]:
-        print(res[2])
+    if not res["is_stable"]:
+        print(res["rogues"])
     
 if __name__ == '__main__':
     main()

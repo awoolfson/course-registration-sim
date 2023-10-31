@@ -1,6 +1,5 @@
 import random
 
-import data
 from section import CourseSection
 from student import Student
 
@@ -60,15 +59,3 @@ def add_student_to_section(
 ) -> (Student, CourseSection):
     student.join_section(section)
     section.enroll(student)
-
-
-def main():
-    if __name__ == "__main__":
-        
-        student_dict, section_dict = data.all_from_csv(
-            "../test_data/test_students_2.csv", "../test_data/test_sections_2_rogue.csv"
-        )
-
-        student_dict, section_dict = gale_shapley_match(student_dict, section_dict)
-
-main()

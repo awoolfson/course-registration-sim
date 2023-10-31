@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 sys.path.append("../src")
 
-import data
+import data_methods
 import gs
 import test_stability
 
@@ -14,7 +14,7 @@ def generate_y(x, sections, trials):
     total_rogues = 0
     for i in range(trials):
         section_dict = copy.deepcopy(sections)
-        student_dict = data.generate_students_weighted(sections, x)
+        student_dict = data_methods.generate_students_weighted(sections, x)
         for key in student_dict:
             student_dict[key].find_conflicts(sections)
         student_dict, section_dict = gs.gale_shapley_match(
@@ -23,7 +23,7 @@ def generate_y(x, sections, trials):
         num_rogues = len(
             test_stability.is_weakly_stable(
                 student_dict=student_dict, section_dict=section_dict
-            )[1]
+            )["rogue_count"]
         )
         total_rogues += num_rogues
     return total_rogues / trials
@@ -54,7 +54,7 @@ def main():
         2000,
         2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000]
 
-    sections = data.section_JSON_to_dict("../scraping/classes.json")
+    sections = data_methods.section_JSON_to_dict("../scraping/classes.json")
     # sections = data.section_csv_to_dict("../test_data/test_sections_2.csv")
     
     trials = 1

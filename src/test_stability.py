@@ -1,7 +1,7 @@
 # checks for pairwise stabilty according to definition given in paper
-def is_weakly_stable(student_dict: dict, section_dict: dict) -> (bool, list):
+def is_weakly_stable(student_dict: dict, section_dict: dict) -> dict:
     
-    rogue_counter = 0
+    rogue_count = 0
 
     is_stable = True
 
@@ -47,11 +47,10 @@ def is_weakly_stable(student_dict: dict, section_dict: dict) -> (bool, list):
             preferred_sections.append(section_id)
 
         rogues += list(map(lambda x: (cur_student.id, x), student_rogues))
-        rogue_counter += len(student_rogues)
+        rogue_count += len(student_rogues)
 
-    if rogue_counter == 0:
+    if rogue_count == 0:
         is_stable = True
     else:
         is_stable = False
-    print(f"counter: {rogue_counter}")
-    return (is_stable, rogue_counter, rogues)
+    return {"is_stable": is_stable, "rogue_count": rogue_count, "rogues": rogues}
