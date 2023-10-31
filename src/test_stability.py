@@ -1,5 +1,7 @@
 # checks for pairwise stabilty according to definition given in paper
-def is_weakly_stable(student_dict: dict, section_dict: dict) -> (bool, list):
+def is_weakly_stable(student_dict: dict, section_dict: dict) -> dict:
+    
+    rogue_count = 0
 
     is_stable = True
 
@@ -12,17 +14,19 @@ def is_weakly_stable(student_dict: dict, section_dict: dict) -> (bool, list):
         cur_student = student_dict[key]
         student_rogues = []
         preferred_sections = []
-        remaining_enrolled_sections = list(cur_student.enrolled_in)
+        remaining_enrolled_sections = cur_student.section_limit
 
         for section_id in cur_student.section_ranking:
+            if cur_student.section_limit == 0:
+                break
             is_rogue = False
             cur_section = section_dict[section_id]
-
+            
             # if fits traditional rogue pair definition
             if not section_id in cur_student.enrolled_in:
                 if (
                     not cur_section.is_full()
-                    or cur_section.get_lowest_student().section_score
+                    or cur_section.get_lowest_student()[0]
                     < cur_section.score_student(cur_student)
                 ):
                     is_rogue = True
@@ -34,18 +38,19 @@ def is_weakly_stable(student_dict: dict, section_dict: dict) -> (bool, list):
                     ):
                         is_rogue = False
             else:
-                remaining_enrolled_sections.remove(section_id)
-                if remaining_enrolled_sections == []:
+                remaining_enrolled_sections -= 1
+                if remaining_enrolled_sections == 0:
                     break
 
             if is_rogue:
                 student_rogues.append(section_id)
             preferred_sections.append(section_id)
 
-        rogues += map(lambda x: (cur_student.id, x), student_rogues)
+        rogues += list(map(lambda x: (cur_student.id, x), student_rogues))
+        rogue_count += len(student_rogues)
 
-    if len(rogues) == 0:
+    if rogue_count == 0:
         is_stable = True
     else:
         is_stable = False
-    return (is_stable, rogues)
+    return {"is_stable": is_stable, "rogue_count": rogue_count, "rogues": rogues}

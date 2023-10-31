@@ -33,7 +33,7 @@ class CourseSection:
     def __str__(self):
         roster = []
         for s in self.roster_pq:
-            roster.append(s.id)
+            roster.append(s[1])
         string = (
             f"{self.dept}{self.course_code}: {self.course_name}\nid: {self.id}\ncapacity: {self.capacity}\n"
             f"credits: {self.credits}\nroster: {roster}\nschedule: {self.schedule}\n"
@@ -45,20 +45,14 @@ class CourseSection:
         if id in self.student_section_scores:
             return self.student_section_scores[id]
         else:
-            mod = 0
-            if student.major == self.dept:
-                mod = 50
-            score = student.base_score + mod
-            self.student_section_scores[id] = score
-            return score
+            return student.base_score
 
     def pop_lowest_student(self) -> Student:
         popped_student = heapq.heappop(self.roster_pq)
         return popped_student
 
     def get_lowest_student(self) -> Student:
-        lowest_student = heapq.heappop(self.roster_pq)
-        heapq.heappush(self.roster_pq, lowest_student)
+        lowest_student = heapq.nsmallest(1, self.roster_pq)[0]
         return lowest_student
 
     def is_full(self) -> bool:
@@ -68,5 +62,5 @@ class CourseSection:
         return len(self.roster_pq) == 0
 
     def enroll(self, student: Student):
-        student.section_score = self.score_student(student)
-        heapq.heappush(self.roster_pq, student)
+        section_score = self.score_student(student)
+        heapq.heappush(self.roster_pq, (section_score, student.id))

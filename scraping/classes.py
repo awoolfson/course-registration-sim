@@ -9,8 +9,11 @@ from bs4 import BeautifulSoup
 
 
 def update_classes() -> None:
+    print("fetching data")
     raw_data = fetch_data()
+    print("parsing data")
     classes = parse_data(raw_data)
+    print("cleaning data")
     classes = clean_data(classes)
     save_data(classes)
 
@@ -19,7 +22,7 @@ def fetch_data() -> bytes:
     url = "https://ssbprod.conncoll.edu/CONN/bwckschd.p_get_crse_unsec"
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     data = {
-        "term_in": 202290,
+        "term_in": 202410,
         "begin_ap": "a",
         "begin_hh": "0",
         "begin_mi": "0",
