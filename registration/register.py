@@ -132,6 +132,8 @@ def main():
 
         new_student.set_section_ranking(ranking)
         new_student.section_limit = section_limit
+        
+        new_student.find_conflicts(sections)
 
         if new_student.name != "awoolfson@conncoll.edu":
             students[new_student.id] = new_student
