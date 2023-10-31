@@ -162,4 +162,6 @@ cython_debug/
 .DS_Store/
 */.DS_Store
 .DS_Store
-*/google_form_students.csv
+google_form_students.csv
+output_students.csv
+output_courses.csv
