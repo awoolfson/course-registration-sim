@@ -26,7 +26,6 @@ def main():
 
     for index, row in response_df.iterrows():
         
-        # score for student
         base_score = 0
         
         taken_courses = row[4]
@@ -47,7 +46,7 @@ def main():
             base_score = 1000
             courses_left = 5 - taken_count
             major = "minor"
-        else: # none of the above
+        else:
             base_score = 0
             courses_left = 0
             major = "none"
@@ -103,7 +102,7 @@ def main():
             "428-1": 10813,
             "496-1": 10334,
             "496-2": 10335,
-            "214-1": 99999 #TEMP
+            "214-1": 99999 # TEMP
             }
         
         pattern = "([0-9]{3}-[0-9]{1})"
@@ -130,26 +129,37 @@ def main():
                 }
         )
 
+        # if new_student.info["courses_desired"] > len(ranking):
+        #     print(new_student.name)
+
         new_student.set_section_ranking(ranking)
         new_student.section_limit = section_limit
-        
+
         new_student.find_conflicts(sections)
 
         if new_student.name != "awoolfson@conncoll.edu":
             students[new_student.id] = new_student
 
     prev_remaining_seats = remaining_seats
-    sorted_students = sorted(students.values(), key=lambda x: x.base_score, reverse=True)
+    # sorted_students = sorted(students.values(), key=lambda x: x.base_score, reverse=True)
     iteration = 0
     while remaining_seats > 0:
         
         # tier 2: majors who haven't gotten any courses
         for student in students.values():
+            if student.major == "minor":
+                print(student.name)
+                print(student.section_limit)
+                print(student.info["max_seats"])
+                print(student.info["courses_needed_hard"])
+                print(student.info["grad_semester"])
+                print(remaining_seats)
             if student.major == "minor" and \
             student.info["grad_semester"] == "Spring 2024" and \
             student.info["max_seats"] > student.section_limit and \
             student.section_limit == student.info["courses_needed_hard"] - 1 and \
             remaining_seats > 0:
+                print("allocated")
                 student.section_limit += 1
                 remaining_seats -= 1
 
@@ -207,6 +217,14 @@ def main():
             break
         prev_remaining_seats = remaining_seats
         iteration += 1
+        
+    for student in students.values():
+        if student.major == "minor" and \
+        student.info["grad_semester"] == "Spring 2024" and \
+        student.info["courses_needed_hard"] == 1 and \
+        student.section_limit == 1:
+            student.base_score += 1000
+        
                 
     gale_shapley_match(students, sections)
     print(is_weakly_stable(students, sections))
@@ -221,15 +239,51 @@ def main():
     print(f"total filled seats: {total_filled_seats}")
     print(f"total seats: {total_seats}")
 
+    # for s in sections[10332].roster_pq:
+    #     print(students[s[1]].info['grad_semester'])
+
     ids = list(students.keys())
     students = list(students.values())
-    students = list(map(lambda x: [x.name, x.enrolled_in], students))
-    students = pd.DataFrame(students, index=ids, columns=["name", "enrolled_in"])
+    
+    students = list(map(
+        lambda x: [
+            x.name,
+            x.info['grad_semester'],
+            x.major,
+            x.info['courses_desired'],
+            x.info['courses_needed_soft'],
+            x.info['courses_needed_hard'],
+            len(x.enrolled_in),
+            x.enrolled_in,
+            list(map(
+                lambda y: sections[y].course_code + ", " + sections[y].course_name,
+                x.enrolled_in
+            ))
+            ],
+        students
+        ))
+    
+    students = pd.DataFrame(
+        students, index=ids, columns=[
+            "name",
+            "grad_semester",
+            "major_status",
+            "num_desired",
+            "num_needed_soft",
+            "num_needed_hard",
+            "num_given",
+            "enrolled_in",
+            "enrolled_in_names"
+            ])
+    
     students.to_csv("output_students.csv")
 
     crns = list(sections.keys())
     sections = list(sections.values())
-    sections = list(map(lambda x: [x.course_name, list(map(lambda y: y[1], x.roster_pq))], sections))
+    sections = list(map(
+        lambda x: [x.course_name, list(map(lambda y: y[1], x.roster_pq))], sections
+        ))
+    
     sections = pd.DataFrame(sections, index=crns, columns=["course_name", "roster"])
     sections.to_csv("output_sections.csv")
     
