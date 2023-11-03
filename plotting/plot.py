@@ -21,7 +21,7 @@ def generate_y(x, sections, trials):
             student_dict, section_dict
         )
         num_rogues = len(
-            test_stability.is_weakly_stable(
+            test_stability.check_stability(
                 student_dict=student_dict, section_dict=section_dict
             )["rogue_count"]
         )

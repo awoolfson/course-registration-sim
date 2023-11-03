@@ -1,5 +1,6 @@
+
 # checks for pairwise stabilty according to definition given in paper
-def is_weakly_stable(student_dict: dict, section_dict: dict) -> dict:
+def check_stability(student_dict: dict, section_dict: dict) -> dict:
     
     rogue_count = 0
 
