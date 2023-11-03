@@ -1,5 +1,10 @@
 """
 Auden Woolfson, 2023
+TODO:
+- prereqs and double take checking and blocking
+- update output for students by course
+- gitignore google form
+- testing for seniors getting their courses
 """
 
 import sys
@@ -12,11 +17,14 @@ sys.path.append("../src")
 from data_methods import section_csv_to_dict
 
 from gs import gale_shapley_match
-from test_stability import is_weakly_stable
+from test_stability import check_stability
 from student import Student
 
 def main():
     sections = section_csv_to_dict("cs_courses_spring24.csv")
+    for section in sections.values():
+        if section.capacity != 28:
+            section.capacity += 2
 
     total_seats = sum(map(lambda x: x.capacity, sections.values()))
     remaining_seats = total_seats
@@ -147,28 +155,27 @@ def main():
         
         # tier 2: majors who haven't gotten any courses
         for student in students.values():
-            if student.major == "minor":
-                print(student.name)
-                print(student.section_limit)
-                print(student.info["max_seats"])
-                print(student.info["courses_needed_hard"])
-                print(student.info["grad_semester"])
-                print(remaining_seats)
+            if student.section_limit == 0 and student.major == "major" and \
+            student.info["max_seats"] > student.section_limit and \
+            remaining_seats > 0 and \
+            student.section_limit < len(student.section_ranking):
+                student.section_limit += 1
+                remaining_seats -= 1
+        
+        # tier 3: minors who need one last course
+        for student in students.values():
+            # if student.major == "minor":
+            #     print(student.name)
+            #     print(student.section_limit)
+            #     print(student.info["max_seats"])
+            #     print(student.info["courses_needed_hard"])
+            #     print(student.info["grad_semester"])
+            #     print(remaining_seats)
             if student.major == "minor" and \
             student.info["grad_semester"] == "Spring 2024" and \
             student.info["max_seats"] > student.section_limit and \
             student.section_limit == student.info["courses_needed_hard"] - 1 and \
             remaining_seats > 0:
-                print("allocated")
-                student.section_limit += 1
-                remaining_seats -= 1
-
-        # tier 3: minors who need one last course
-        for student in students.values():
-            if student.section_limit == 0 and student.major == "major" and \
-            student.info["max_seats"] > student.section_limit and \
-            remaining_seats > 0 and \
-            student.section_limit < len(student.section_ranking):
                 student.section_limit += 1
                 remaining_seats -= 1
 
@@ -188,7 +195,7 @@ def main():
                     student.section_limit += 1
                     remaining_seats -= 1
                 
-        # tier 6: non seniro majors who want an extra course
+        # tier 6: non senior majors who want an extra course
         for student in students.values():
             if student.info["grad_semester"] != "Spring 2024" and \
             student.major == "major" and \
@@ -224,10 +231,35 @@ def main():
         student.info["courses_needed_hard"] == 1 and \
         student.section_limit == 1:
             student.base_score += 1000
-        
                 
     gale_shapley_match(students, sections)
-    print(is_weakly_stable(students, sections))
+
+    for student in students.values():
+        if 10324 in student.section_ranking or 10325 in student.section_ranking:
+            print(f"\ndata structures in ranking: {student.name} section limit {student.section_limit}")
+            if student.section_ranking[0] == 10324 or student.section_ranking[0] == 10325:
+                print("data structures first")
+            else:
+                print("data structures not first")
+            if 10324 in student.enrolled_in or 10325 in student.enrolled_in:
+                print("enrolled in data stuctures")
+            else:
+                print("not enrolled in data structures")
+                
+    for student in students.values():
+        if 10332 in student.section_ranking and student.info["grad_semester"] == "Spring 2024" and student.major == "major":
+            print(f"\n{student.name} has 10332 in ranking")
+            if 10332 in student.enrolled_in:
+                print("enrolled in networks")
+            else:
+                print("not enrolled in networks")
+            print(f"{student.section_ranking.index(10332) + 1} in ranking")
+    
+    for section in sections.values():
+        if len(section.roster_pq) < section.capacity:
+            print(f"\n{section.course_name} has {section.capacity - len(section.roster_pq)} empty seats")
+    
+    print(check_stability(students, sections))
 
     total_desired_seats = sum(map(lambda x: x.info["courses_desired"], students.values()))
     total_allocated_seats = sum(map(lambda x: x.section_limit, students.values()))
@@ -243,9 +275,9 @@ def main():
     #     print(students[s[1]].info['grad_semester'])
 
     ids = list(students.keys())
-    students = list(students.values())
+    students_output = list(students.values())
     
-    students = list(map(
+    students_output = list(map(
         lambda x: [
             x.name,
             x.info['grad_semester'],
@@ -253,39 +285,45 @@ def main():
             x.info['courses_desired'],
             x.info['courses_needed_soft'],
             x.info['courses_needed_hard'],
+            x.section_limit,
             len(x.enrolled_in),
             x.enrolled_in,
             list(map(
                 lambda y: sections[y].course_code + ", " + sections[y].course_name,
                 x.enrolled_in
-            ))
-            ],
-        students
+            ))],
+        students_output
         ))
     
-    students = pd.DataFrame(
-        students, index=ids, columns=[
+    students_output = pd.DataFrame(
+        students_output, index=ids, columns=[
             "name",
             "grad_semester",
             "major_status",
             "num_desired",
             "num_needed_soft",
             "num_needed_hard",
+            "num_allocated",
             "num_given",
             "enrolled_in",
             "enrolled_in_names"
             ])
     
-    students.to_csv("output_students.csv")
+    students_output.to_csv("output_students.csv")
 
     crns = list(sections.keys())
-    sections = list(sections.values())
-    sections = list(map(
-        lambda x: [x.course_name, list(map(lambda y: y[1], x.roster_pq))], sections
+    sections_output = list(sections.values())
+    sections_output = list(map(
+        lambda x: [
+            x.course_name, 
+            len(x.roster_pq), 
+            list(map(lambda y: (y[1], students[y[1]].name), x.roster_pq))
+            ], 
+        sections_output
         ))
     
-    sections = pd.DataFrame(sections, index=crns, columns=["course_name", "roster"])
-    sections.to_csv("output_sections.csv")
+    sections_output = pd.DataFrame(sections_output, index=crns, columns=["course_name", "num_enrolled", "roster"])
+    sections_output.to_csv("output_sections.csv")
     
 if __name__ == "__main__":
     main()
