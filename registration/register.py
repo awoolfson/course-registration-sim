@@ -1,7 +1,7 @@
 """
 Auden Woolfson, 2023
 TODO:
-- prereqs and double take checking and blocking
+- prereqs checking and blocking
 - update output for students by course
 - gitignore google form
 - testing for seniors getting their coursesm (seminar)
@@ -331,6 +331,12 @@ def main():
     
     sections_output = pd.DataFrame(sections_output, index=crns, columns=["course_name", "num_enrolled", "roster"])
     sections_output.to_csv("output_sections.csv")
+    
+    for section in sections.values():
+        roster = list(map(lambda x: x[1], section.roster_pq))
+        filepath = "individual_sections/" + section.course_code + ".csv"
+        section_output = students_output[students_output.index.isin(roster)]
+        section_output.to_csv(filepath)
     
 if __name__ == "__main__":
     main()
