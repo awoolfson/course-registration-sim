@@ -2,9 +2,6 @@
 Auden Woolfson, 2023
 TODO:
 - prereqs checking and blocking
-- update output for students by course
-- gitignore google form
-- testing for seniors getting their coursesm (seminar)
 """
 
 import sys
@@ -107,7 +104,7 @@ def main():
             "428-1": 10813,
             "496-1": 10334,
             "496-2": 10335,
-            "214-1": 99999 # TEMP
+            "214-1": 10840
             }
         
         pattern = "([0-9]{3})"
@@ -231,36 +228,6 @@ def main():
             student.base_score += 1000
                 
     gale_shapley_match(students, sections)
-
-    # for student in students.values():
-    #     if 10324 in student.section_ranking or 10325 in student.section_ranking:
-    #         print(f"\ndata structures in ranking: {student.name} section limit {student.section_limit}")
-    #         if student.section_ranking[0] == 10324 or student.section_ranking[0] == 10325:
-    #             print("data structures first")
-    #         else:
-    #             print("data structures not first")
-    #         if 10324 in student.enrolled_in or 10325 in student.enrolled_in:
-    #             print("enrolled in data stuctures")
-    #         else:
-    #             print("not enrolled in data structures")
-                
-    # for student in students.values():
-    #     if 10332 in student.section_ranking and student.info["grad_semester"] == "Spring 2024" and student.major == "major":
-    #         print(f"\n{student.name} has 10332 in ranking")
-    #         if 10332 in student.enrolled_in:
-    #             print("enrolled in networks")
-    #         else:
-    #             print("not enrolled in networks")
-    #         print(f"networks is #{student.section_ranking.index(10332) + 1} in ranking")
-            
-    # for student in students.values():
-    #     if (10334 in student.section_ranking or 10335 in student.section_ranking) and \
-    #     student.info["grad_semester"] == "Spring 2024" and student.major == "major":
-    #         print(f"\n{student.name} has 10334 in ranking")
-    #         if 10334 in student.enrolled_in or 10335 in student.enrolled_in:
-    #             print("enrolled in seminar")
-    #         else:
-    #             print("not enrolled in seminar")
     
     for section in sections.values():
         if len(section.roster_pq) < section.capacity:
@@ -277,9 +244,6 @@ def main():
     print(f"total allocated seats: {total_allocated_seats}")
     print(f"total filled seats: {total_filled_seats}")
     print(f"total seats: {total_seats}")
-
-    # for s in sections[10332].roster_pq:
-    #     print(students[s[1]].info['grad_semester'])
 
     ids = list(students.keys())
     students_output = list(students.values())
