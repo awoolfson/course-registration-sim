@@ -17,7 +17,7 @@ def main():
     for student in student_dict.values():
         print(student)
 
-    res = test_stability.is_weakly_stable(student_dict, section_dict)
+    res = test_stability.check_stability(student_dict, section_dict)
     if not res[0]:
         print(res[2])
 
@@ -33,7 +33,7 @@ def main():
     for student in student_dict.values():
         print(student)
 
-    res = test_stability.is_weakly_stable(student_dict, section_dict)
+    res = test_stability.check_stability(student_dict, section_dict)
     if not res["is_stable"]:
         print(res["rogues"])
     
