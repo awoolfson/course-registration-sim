@@ -1,11 +1,8 @@
 """
 Auden Woolfson, 2023
-TODO:
-- prereqs checking and blocking
 """
 
 import sys
-from pprint import pprint
 import re
 import pandas as pd
 
@@ -31,7 +28,10 @@ def main():
         base_score = 0
         
         taken_courses = row[4]
-        taken_courses = taken_courses.split(",")
+        if type(taken_courses) == str:
+            taken_courses = taken_courses.split(",")
+        else:
+            taken_courses = []
         taken_count = len(taken_courses)
         status = row[3]
         
@@ -110,10 +110,41 @@ def main():
         pattern = "([0-9]{3})"
         taken = set()
         taken_entry = row[4]
-        taken_entry = taken_entry.split(",")
+        if type(taken_entry) == str:
+            taken_entry = taken_entry.split(",")
+        else:
+            taken_entry = []
         for entry in taken_entry:
             number = re.findall(pattern, entry)[0]
             taken.add(number)
+            
+        can_take = set(map(lambda x: x[:3], crns.keys())) - (taken - {"495", "496"})
+        to_remove = set()
+        
+        if "212" not in taken:
+            for course in can_take:
+                if course[0] == "3" or course[0] == "4":
+                    to_remove.add(course)
+                        
+        # # prereqs for 400 level courses
+        # else:
+        #     has_three_hundred = False
+        #     for course in taken:
+        #         if course[0] == "3":
+        #             has_three_hundred = True
+        #             break
+        #     if not has_three_hundred:
+        #         for course in can_take:
+        #             if course[0] == "4":
+        #                 to_remove.add(course)
+                    
+            if "219" not in taken:
+                to_remove.add("315")
+            
+        # if len(to_remove.intersection(can_take)) > 0:
+        #     print(f"{row[1]} blocked from: {to_remove.intersection(can_take)}, only took: {taken}")
+        
+        can_take -= to_remove
         
         pattern = "([0-9]{3}-[0-9]{1})"
         ranking = []
@@ -121,11 +152,11 @@ def main():
             if type(row[i]) == str:
                 number = re.match(pattern, row[i])
                 number = number.group(1)
-                if number[:3] not in taken or number[:3] in ["495", "496"]:
+                # if number[:3] == "212" and "212" in taken:
+                #     print(f"{row[1]}")
+                if number[:3] in can_take:
                     if crn := crns.get(number, None):
                         ranking.append(crn)
-                else:
-                    print(f"{row[1]} has selected {number} as taken")
             
         # tier 1: majors needs
         section_limit = min(courses_needed_soft, row[20], 4, len(ranking)) if major == "major" else 0
@@ -148,8 +179,7 @@ def main():
 
         new_student.find_conflicts(sections)
 
-        if new_student.name != "awoolfson@conncoll.edu":
-            students[new_student.id] = new_student
+        students[new_student.id] = new_student
 
     prev_remaining_seats = remaining_seats
     iteration = 0
