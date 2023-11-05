@@ -166,3 +166,5 @@ google_form_students.csv
 output_students.csv
 output_sections.csv
 registration/individual_sections/*
+registration/individual_sections.zip
+registration/overrides.xlsx
