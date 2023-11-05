@@ -145,6 +145,7 @@ def main():
         #     print(f"{row[1]} blocked from: {to_remove.intersection(can_take)}, only took: {taken}")
         
         can_take -= to_remove
+        section_limit = 0
         
         pattern = "([0-9]{3}-[0-9]{1})"
         ranking = []
@@ -157,9 +158,11 @@ def main():
                 if number[:3] in can_take:
                     if crn := crns.get(number, None):
                         ranking.append(crn)
+                        if number[:3] == "212":
+                            section_limit = 1
             
         # tier 1: majors needs
-        section_limit = min(courses_needed_soft, row[20], 4, len(ranking)) if major == "major" else 0
+        section_limit = min(courses_needed_soft, row[20], 4, len(ranking)) if major == "major" else section_limit
         remaining_seats -= section_limit
         
         new_student = Student(
@@ -183,10 +186,11 @@ def main():
 
     prev_remaining_seats = remaining_seats
     iteration = 0
+    sorted_students = sorted(students.values(), key=lambda x: x.base_score, reverse=True)
     while remaining_seats > 0:
         
         # tier 2: majors who haven't gotten any courses
-        for student in students.values():
+        for student in sorted_students:
             if student.section_limit == 0 and student.major == "major" and \
             student.info["max_seats"] > student.section_limit and \
             remaining_seats > 0 and \
@@ -195,7 +199,7 @@ def main():
                 remaining_seats -= 1
         
         # tier 3: minors who need one last course
-        for student in students.values():
+        for student in sorted_students:
             if student.major == "minor" and \
             student.info["grad_semester"] == "Spring 2024" and \
             student.info["max_seats"] > student.section_limit and \
@@ -204,24 +208,23 @@ def main():
                 student.section_limit += 1
                 remaining_seats -= 1
 
-        # tier 4: graduating majors who want an extra course
-        for student in students.values():
+        # tier 4: graduating majors who want extra courses
+        for student in sorted_students:
             if student.info["grad_semester"] == "Spring 2024" and \
-            student.info["max_seats"] > student.section_limit and \
-            student.major == "major" and \
-            remaining_seats > 0:
-                student.section_limit += 1
-                remaining_seats -= 1
+            student.major == "major":
+                while student.info["max_seats"] > student.section_limit and remaining_seats > 0:
+                    student.section_limit += 1
+                    remaining_seats -= 1
                 
         # tier 5: intended majors needs
-        for student in students.values():
+        for student in sorted_students:
             if student.major == "intended":
                 while student.info["max_seats"] > student.section_limit and remaining_seats > 0:
                     student.section_limit += 1
                     remaining_seats -= 1
                 
         # tier 6: non senior majors who want an extra course
-        for student in students.values():
+        for student in sorted_students:
             if student.info["grad_semester"] != "Spring 2024" and \
             student.major == "major" and \
             student.info["max_seats"] > student.section_limit and \
@@ -230,7 +233,7 @@ def main():
                 remaining_seats -= 1
                 
         # tier 7: all minors who want an extra course
-        for student in students.values():
+        for student in sorted_students:
             if student.major == "minor" and \
             student.info["max_seats"] > student.section_limit and \
             remaining_seats > 0:
@@ -238,7 +241,7 @@ def main():
                 remaining_seats -= 1
                 
         # tier 8: other
-        for student in students.values():
+        for student in sorted_students:
             if student.section_limit <= iteration and \
             student.info["max_seats"] > student.section_limit and \
             remaining_seats > 0:
@@ -326,11 +329,14 @@ def main():
     sections_output = pd.DataFrame(sections_output, index=crns, columns=["course_name", "num_enrolled", "roster"])
     sections_output.to_csv("output_sections.csv")
     
+    writer = pd.ExcelWriter('overrides.xlsx', engine='xlsxwriter')
     for section in sections.values():
         roster = list(map(lambda x: x[1], section.roster_pq))
         filepath = "individual_sections/" + section.course_code + ".csv"
         section_output = students_output[students_output.index.isin(roster)]
         section_output.to_csv(filepath)
+        section_output.to_excel(writer, sheet_name=section.course_code)
+    writer.save()
     
 if __name__ == "__main__":
     main()
