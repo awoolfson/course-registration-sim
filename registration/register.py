@@ -1,14 +1,8 @@
 """
 Auden Woolfson, 2023
-TODO:
-- prereqs and double take checking and blocking
-- update output for students by course
-- gitignore google form
-- testing for seniors getting their coursesm (seminar)
 """
 
 import sys
-from pprint import pprint
 import re
 import pandas as pd
 
@@ -34,7 +28,10 @@ def main():
         base_score = 0
         
         taken_courses = row[4]
-        taken_courses = taken_courses.split(",")
+        if type(taken_courses) == str:
+            taken_courses = taken_courses.split(",")
+        else:
+            taken_courses = []
         taken_count = len(taken_courses)
         status = row[3]
         
@@ -107,16 +104,48 @@ def main():
             "428-1": 10813,
             "496-1": 10334,
             "496-2": 10335,
-            "214-1": 99999 # TEMP
+            "214-1": 10840
             }
         
         pattern = "([0-9]{3})"
         taken = set()
         taken_entry = row[4]
-        taken_entry = taken_entry.split(",")
+        if type(taken_entry) == str:
+            taken_entry = taken_entry.split(",")
+        else:
+            taken_entry = []
         for entry in taken_entry:
             number = re.findall(pattern, entry)[0]
             taken.add(number)
+            
+        can_take = set(map(lambda x: x[:3], crns.keys())) - (taken - {"495", "496"})
+        to_remove = set()
+        
+        if "212" not in taken:
+            for course in can_take:
+                if course[0] == "3" or course[0] == "4":
+                    to_remove.add(course)
+                        
+        # # prereqs for 400 level courses
+        # else:
+        #     has_three_hundred = False
+        #     for course in taken:
+        #         if course[0] == "3":
+        #             has_three_hundred = True
+        #             break
+        #     if not has_three_hundred:
+        #         for course in can_take:
+        #             if course[0] == "4":
+        #                 to_remove.add(course)
+                    
+            if "219" not in taken:
+                to_remove.add("315")
+            
+        # if len(to_remove.intersection(can_take)) > 0:
+        #     print(f"{row[1]} blocked from: {to_remove.intersection(can_take)}, only took: {taken}")
+        
+        can_take -= to_remove
+        section_limit = 0
         
         pattern = "([0-9]{3}-[0-9]{1})"
         ranking = []
@@ -124,14 +153,16 @@ def main():
             if type(row[i]) == str:
                 number = re.match(pattern, row[i])
                 number = number.group(1)
-                if number[:3] not in taken or number[:3] in ["495", "496"]:
+                # if number[:3] == "212" and "212" in taken:
+                #     print(f"{row[1]}")
+                if number[:3] in can_take:
                     if crn := crns.get(number, None):
                         ranking.append(crn)
-                else:
-                    print(f"{row[1]} has selected {number} as taken")
+                        if number[:3] == "212":
+                            section_limit = 1
             
         # tier 1: majors needs
-        section_limit = min(courses_needed_soft, row[20], 4, len(ranking)) if major == "major" else 0
+        section_limit = min(courses_needed_soft, row[20], 4, len(ranking)) if major == "major" else section_limit
         remaining_seats -= section_limit
         
         new_student = Student(
@@ -151,15 +182,15 @@ def main():
 
         new_student.find_conflicts(sections)
 
-        if new_student.name != "awoolfson@conncoll.edu":
-            students[new_student.id] = new_student
+        students[new_student.id] = new_student
 
     prev_remaining_seats = remaining_seats
     iteration = 0
+    sorted_students = sorted(students.values(), key=lambda x: x.base_score, reverse=True)
     while remaining_seats > 0:
         
         # tier 2: majors who haven't gotten any courses
-        for student in students.values():
+        for student in sorted_students:
             if student.section_limit == 0 and student.major == "major" and \
             student.info["max_seats"] > student.section_limit and \
             remaining_seats > 0 and \
@@ -168,7 +199,7 @@ def main():
                 remaining_seats -= 1
         
         # tier 3: minors who need one last course
-        for student in students.values():
+        for student in sorted_students:
             if student.major == "minor" and \
             student.info["grad_semester"] == "Spring 2024" and \
             student.info["max_seats"] > student.section_limit and \
@@ -177,24 +208,23 @@ def main():
                 student.section_limit += 1
                 remaining_seats -= 1
 
-        # tier 4: graduating majors who want an extra course
-        for student in students.values():
+        # tier 4: graduating majors who want extra courses
+        for student in sorted_students:
             if student.info["grad_semester"] == "Spring 2024" and \
-            student.info["max_seats"] > student.section_limit and \
-            student.major == "major" and \
-            remaining_seats > 0:
-                student.section_limit += 1
-                remaining_seats -= 1
+            student.major == "major":
+                while student.info["max_seats"] > student.section_limit and remaining_seats > 0:
+                    student.section_limit += 1
+                    remaining_seats -= 1
                 
         # tier 5: intended majors needs
-        for student in students.values():
+        for student in sorted_students:
             if student.major == "intended":
                 while student.info["max_seats"] > student.section_limit and remaining_seats > 0:
                     student.section_limit += 1
                     remaining_seats -= 1
                 
         # tier 6: non senior majors who want an extra course
-        for student in students.values():
+        for student in sorted_students:
             if student.info["grad_semester"] != "Spring 2024" and \
             student.major == "major" and \
             student.info["max_seats"] > student.section_limit and \
@@ -203,7 +233,7 @@ def main():
                 remaining_seats -= 1
                 
         # tier 7: all minors who want an extra course
-        for student in students.values():
+        for student in sorted_students:
             if student.major == "minor" and \
             student.info["max_seats"] > student.section_limit and \
             remaining_seats > 0:
@@ -211,7 +241,7 @@ def main():
                 remaining_seats -= 1
                 
         # tier 8: other
-        for student in students.values():
+        for student in sorted_students:
             if student.section_limit <= iteration and \
             student.info["max_seats"] > student.section_limit and \
             remaining_seats > 0:
@@ -231,36 +261,6 @@ def main():
             student.base_score += 1000
                 
     gale_shapley_match(students, sections)
-
-    # for student in students.values():
-    #     if 10324 in student.section_ranking or 10325 in student.section_ranking:
-    #         print(f"\ndata structures in ranking: {student.name} section limit {student.section_limit}")
-    #         if student.section_ranking[0] == 10324 or student.section_ranking[0] == 10325:
-    #             print("data structures first")
-    #         else:
-    #             print("data structures not first")
-    #         if 10324 in student.enrolled_in or 10325 in student.enrolled_in:
-    #             print("enrolled in data stuctures")
-    #         else:
-    #             print("not enrolled in data structures")
-                
-    # for student in students.values():
-    #     if 10332 in student.section_ranking and student.info["grad_semester"] == "Spring 2024" and student.major == "major":
-    #         print(f"\n{student.name} has 10332 in ranking")
-    #         if 10332 in student.enrolled_in:
-    #             print("enrolled in networks")
-    #         else:
-    #             print("not enrolled in networks")
-    #         print(f"networks is #{student.section_ranking.index(10332) + 1} in ranking")
-            
-    # for student in students.values():
-    #     if (10334 in student.section_ranking or 10335 in student.section_ranking) and \
-    #     student.info["grad_semester"] == "Spring 2024" and student.major == "major":
-    #         print(f"\n{student.name} has 10334 in ranking")
-    #         if 10334 in student.enrolled_in or 10335 in student.enrolled_in:
-    #             print("enrolled in seminar")
-    #         else:
-    #             print("not enrolled in seminar")
     
     for section in sections.values():
         if len(section.roster_pq) < section.capacity:
@@ -277,9 +277,6 @@ def main():
     print(f"total allocated seats: {total_allocated_seats}")
     print(f"total filled seats: {total_filled_seats}")
     print(f"total seats: {total_seats}")
-
-    # for s in sections[10332].roster_pq:
-    #     print(students[s[1]].info['grad_semester'])
 
     ids = list(students.keys())
     students_output = list(students.values())
@@ -331,6 +328,15 @@ def main():
     
     sections_output = pd.DataFrame(sections_output, index=crns, columns=["course_name", "num_enrolled", "roster"])
     sections_output.to_csv("output_sections.csv")
+    
+    writer = pd.ExcelWriter('overrides.xlsx', engine='xlsxwriter')
+    for section in sections.values():
+        roster = list(map(lambda x: x[1], section.roster_pq))
+        filepath = "individual_sections/" + section.course_code + ".csv"
+        section_output = students_output[students_output.index.isin(roster)]
+        section_output.to_csv(filepath)
+        section_output.to_excel(writer, sheet_name=section.course_code)
+    writer.save()
     
 if __name__ == "__main__":
     main()
