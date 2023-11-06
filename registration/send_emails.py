@@ -24,7 +24,7 @@ for index, row in data.iterrows():
     initial_message = ""
     positive_message = ""
     if row['enrolled_in_names'] != '[]':
-        enrolled_in_names = row['enrolled_in_names'].replace('[', '').replace(']', '').replace("'", '')
+        enrolled_in_names = row['enrolled_in_names'].replace('[', '').replace(']', '').replace("'", '').strip()
         
         initial_message = """
 You are receiving this email because you have been awarded seats in the following CS courses for the Spring 2024 semester:
@@ -44,6 +44,7 @@ it also means that there does not exist any pair of students (say, a and b) who 
         """
         
     else:
+        
         initial_message = """
 We are sorry to inform you that you have not been allocated any seats in CS courses for the Spring 2024 semester.
 
@@ -53,6 +54,7 @@ Another course that is a requirement for the major and allowed for the minor is 
 We will automatically add you to the wait list of the courses you ranked, but did not get into.  
 If there are any other courses you are willing to take other than those you ranked, you may email the professor directly to be added to the wait list.
         """
+        
         positive_message = ""
         
     body = """
