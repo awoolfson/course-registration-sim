@@ -155,8 +155,6 @@ def main():
             if type(row[i]) == str:
                 number = re.match(pattern, row[i])
                 number = number.group(1)
-                # if number[:3] == "212" and "212" in taken:
-                #     print(f"{row[1]}")
                 if number[:3] in can_take:
                     if crn := crns.get(number, None):
                         ranking.append(crn)
@@ -258,26 +256,40 @@ def main():
         prev_remaining_seats = remaining_seats
         iteration += 1
         
+    # robotics_final_roster = {
+    #  'cmeza@conncoll.edu', 
+    #  'zwheat@conncoll.edu', 
+    #  'jasaro@conncoll.edu', 
+    #  'adobro@conncoll.edu', 
+    #  'jrondon@conncoll.edu', 
+    #  'ktipnis@conncoll.edu', 
+    #  'rkosovsky@conncoll.edu', 
+    #  'ylee5@conncoll.edu', 
+    #  'abolcerek@conncoll.edu', 
+    #  'pokai@conncoll.edu', 
+    #  'ztate@conncoll.edu', 
+    #  'faladin@conncoll.edu', 
+    #  'rchang@conncoll.edu', 
+    #  'qfurgueso@conncoll.edu', 
+    #  'mvolpi1@conncoll.edu', 
+    #  'wzhang4@conncoll.edu', 
+    #  'clincoln1@conncoll.edu', 
+    #  'mrenwicka@conncoll.edu', 
+    #  'ptsiali@conncoll.edu', 
+    #  'bbrandenb@conncoll.edu'
+    # }
+    # robotics_roster_info = {}
     # give those minors with one more course the needed boost
     for student in students.values():
         if student.major == "minor" and \
         student.info["grad_semester"] == "Spring 2024" and \
         student.info["courses_needed_hard"] == 1:
-            student.base_score += 2000
-    
-    # min_unlucky_students = 100
-    # best_seed = 1
-    # for s in range(0, 10):
-    #     unlucky_students = 0
-    #     test_students = copy.deepcopy(students)
-    #     gale_shapley_match(test_students, sections, shuffle=True, seed=s)
-
-    #     if unlucky_students < min_unlucky_students:
-    #         min_unlucky_students = unlucky_students
-    #         best_seed = s
-    # students = test_students
-    # print(f"BEST SEED: {best_seed}")
-        
+            student.base_score += 2000 # same as majors
+    #     if student.name in robotics_final_roster:
+    #         robotics_roster_info[student.id] = [student.name, student.base_score, student.section_ranking.index(10330)+1]
+    # robotics_roster_info = pd.DataFrame.from_dict(robotics_roster_info, orient='index', columns=['name', 'base_score', 'robotics_rank'])
+    # robotics_roster_info.to_csv("robotics_roster_info.csv")
+            
     seed = 1
     gale_shapley_match(students, sections, shuffle=True, seed=seed)
     print(seed)

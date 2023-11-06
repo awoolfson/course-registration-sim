@@ -12,14 +12,13 @@ EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 
 # Read data from the CSV file
 os.chdir('registration')
-data = pd.read_csv('output_students.csv')
+data = pd.read_csv('final_output_students.csv')
 
 # Iterate through each row in the CSV file
 for index, row in data.iterrows():
-    # if row['enrolled_in_names'] != '[]':
-    #     continue
+    print(f"Sending email to {row['name']}...")
     sent_from = "Christine Chung (automated email)"
-    to = 'awoolfson@conncoll.edu' #[row['name']]'cchung@conncoll.edu'
+    to = row['name']
     subject = 'CS Course Pre-Registration Overrides'
     initial_message = ""
     positive_message = ""
@@ -32,7 +31,9 @@ You are receiving this email because you have been awarded seats in the followin
 %s
 
 Your professors will be entering overrides for you by Nov 10 so that you will be able to add the course during online pre-registration the week Nov 13.
-Be sure to use this override no later than Nov 16.  If you add the class after Nov 16 we may have to ask you to drop it in the event it gets overenrolled
+Be sure to use this override no later than Nov 16.  If you add the class after Nov 16 we may have to ask you to drop it in the event it gets overenrolled.
+
+We will automatically add you to the wait list of the coures you ranked, but did not get into if you got into less courses than you needed to stay on track.
         """ % (enrolled_in_names)
         
         positive_message = """
@@ -52,7 +53,8 @@ There is still a chance that seats will remain unfilled after Nov 16 and in this
 Another course that is a requirement for the major and allowed for the minor is MAT210 Discrete Math, which you can register for the usual way.
 
 We will automatically add you to the wait list of the courses you ranked, but did not get into.  
-If there are any other courses you are willing to take other than those you ranked, you may email the professor directly to be added to the wait list.
+If there are any courses you are willing to take other than those you have already ranked in the form, you may email the 
+professor directly to be added to their wait list.
         """
         
         positive_message = ""
@@ -64,11 +66,12 @@ Dear %s:
 
 Here is more info about how we assigned students to courses, in case you are curious:
 %s
-Students who did not get into any courses they ranked in the registration form (or got fewer than they wished for) did not get them because either:
-(1) they were not declared CS majors, and/or 
-(2) are first or second years with lower priority than juniors/seniors, and/or 
-(3) only ranked/selected courses that were in higher demand and those courses filled up before their priority level was reached, and/or.
-(4) you did not meet the prerequisites of the course(s) you requested (e.g., COM212 for any 300-level course, or COM219 + COM212 for COM315)
+Students who did not get assigned any courses (or got fewer than they wished for) didn’t get them because they:
+
+(1) were not declared CS majors, and/or 
+(2) are first or second years with lower priority than juniors/seniors, and/or
+(3) only ranked/selected courses that were in higher demand, and those courses filled up before their priority level was reached, and/or
+(4) did not meet the prerequisites of the course(s) they requested (e.g., COM212 for any 300-level course, and COM219 + COM212 for COM315)"
 
 
 We appreciate your collaboration in this new process, we hope it will be a better experience for everyone. If you have any other questions please feel free to 
@@ -99,5 +102,5 @@ Subject: %s
     server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
     server.sendmail(sent_from, to, email_text.encode("utf-8"))
     server.close()
-    print('Email sent!')
+    print(f"Email sent to {row['name']}!")
         
