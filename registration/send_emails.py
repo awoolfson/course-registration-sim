@@ -19,9 +19,10 @@ for index, row in data.iterrows():
     # if row['enrolled_in_names'] != '[]':
     #     continue
     sent_from = "Christine Chung (automated email)"
-    to = 'awoolfson@conncoll.edu' #[row['name']]'cchung@conncoll.edu'#
+    to = 'awoolfson@conncoll.edu' #[row['name']]'cchung@conncoll.edu'
     subject = 'CS Course Pre-Registration Overrides'
     initial_message = ""
+    positive_message = ""
     if row['enrolled_in_names'] != '[]':
         enrolled_in_names = row['enrolled_in_names'].replace('[', '').replace(']', '').replace("'", '')
         
@@ -34,6 +35,14 @@ Your professors will be entering overrides for you by Nov 10 so that you will be
 Be sure to use this override no later than Nov 16.  If you add the class after Nov 16 we may have to ask you to drop it in the event it gets overenrolled
         """ % (enrolled_in_names)
         
+        positive_message = """
+        
+The algorithm we implemented was able to successfully assign students in a “stable” way, in other words, no student wishes to have any course over one they were given, 
+unless that course they want more is filled with students that all have higher priority for getting the course.  Due to the universal nature of the priority/need function we applied, 
+it also means that there does not exist any pair of students (say, a and b) who have been assigned courses (say x and y, respectively), such that a and b would both be happier swapping their seats in x and y with each other. 
+
+        """
+        
     else:
         initial_message = """
 We are sorry to inform you that you have not been allocated any seats in CS courses for the Spring 2024 semester.
@@ -44,18 +53,15 @@ Another course that is a requirement for the major and allowed for the minor is 
 We will automatically add you to the wait list of the courses you ranked, but did not get into.  
 If there are any other courses you are willing to take other than those you ranked, you may email the professor directly to be added to the wait list.
         """
+        positive_message = ""
+        
     body = """
 Dear %s:
 
 %s
 
 Here is more info about how we assigned students to courses, in case you are curious:
-
-
-The algorithm we implemented was able to successfully assign students in a “stable” way, in other words, no student wishes to have any course over one they were given, 
-unless that course they want more is filled with students that all have higher priority for getting the course.  Due to the universal nature of the priority/need function we applied, 
-it also means that there does not exist any pair of students (say, a and b) who have been assigned courses (say x and y, respectively), such that a and b would both be happier swapping their seats in x and y with each other. 
-
+%s
 Students who did not get into any courses they ranked in the registration form (or got fewer than they wished for) did not get them because either:
 (1) they were not declared CS majors, and/or 
 (2) are first or second years with lower priority than juniors/seniors, and/or 
@@ -64,13 +70,14 @@ Students who did not get into any courses they ranked in the registration form (
 
 
 We appreciate your collaboration in this new process, we hope it will be a better experience for everyone. If you have any other questions please feel free to 
-reach out to me at cchung@conncoll.edu or Auden at awoolfson@conncoll.edu. The code behind the algorithm is available to view at https://github.com/awoolfson/course-registration-sim/tree/validation.
+reach out to me at cchung@conncoll.edu or Auden at awoolfson@conncoll.edu. The code behind the algorithm is available to view at https://github.com/awoolfson/course-registration-sim.
 
 
 Thank you,
 Christine
     """ % (row['name'],
-           initial_message
+           initial_message,
+            positive_message
            )
     
     email_text = """\
@@ -79,7 +86,11 @@ To: %s
 Subject: %s
 
 %s
-    """ % (sent_from, "".join(to), subject, body)
+    """ % (sent_from, 
+           "".join(to), 
+           subject, 
+           body
+           )
 
     server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
     server.ehlo()

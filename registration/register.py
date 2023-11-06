@@ -5,6 +5,8 @@ Auden Woolfson, 2023
 import sys
 import re
 import pandas as pd
+import copy
+import random
 
 sys.path.append("../src")
 
@@ -160,6 +162,9 @@ def main():
                         ranking.append(crn)
                         if number[:3] == "212":
                             section_limit = 1
+                            
+        if major == "intended":
+            section_limit = 1
             
         # tier 1: majors needs
         section_limit = min(courses_needed_soft, row[20], 4, len(ranking)) if major == "major" else section_limit
@@ -172,7 +177,7 @@ def main():
                 "courses_needed_hard": courses_needed_hard,
                 "courses_desired": row[20],
                 "grad_semester": grad_semester,
-                "max_seats": min(4, len(ranking), row[20]),
+                "max_seats": min(max(3, courses_needed_hard) , len(ranking), row[20]),
                 "courses_taken": taken,
                 }
         )
@@ -258,14 +263,34 @@ def main():
         if student.major == "minor" and \
         student.info["grad_semester"] == "Spring 2024" and \
         student.info["courses_needed_hard"] == 1:
-            student.base_score += 1000
-                
-    gale_shapley_match(students, sections)
+            student.base_score += 2000
     
+    # min_unlucky_students = 100
+    # best_seed = 1
+    # for s in range(0, 10):
+    #     unlucky_students = 0
+    #     test_students = copy.deepcopy(students)
+    #     gale_shapley_match(test_students, sections, shuffle=True, seed=s)
+
+    #     if unlucky_students < min_unlucky_students:
+    #         min_unlucky_students = unlucky_students
+    #         best_seed = s
+    # students = test_students
+    # print(f"BEST SEED: {best_seed}")
+        
+    seed = 1
+    gale_shapley_match(students, sections, shuffle=True, seed=seed)
+    print(seed)
+    
+    students_with_zero = 0
+    for student in students.values():
+        if student.section_limit > 0 and len(student.enrolled_in) == 0:
+            students_with_zero += 1
+
     for section in sections.values():
         if len(section.roster_pq) < section.capacity:
             print(f"\n{section.course_name} has {section.capacity - len(section.roster_pq)} empty seats")
-    
+
     print(check_stability(students, sections))
 
     total_desired_seats = sum(map(lambda x: x.info["courses_desired"], students.values()))
@@ -277,6 +302,7 @@ def main():
     print(f"total allocated seats: {total_allocated_seats}")
     print(f"total filled seats: {total_filled_seats}")
     print(f"total seats: {total_seats}")
+    print(f"students with zero: {students_with_zero}")
 
     ids = list(students.keys())
     students_output = list(students.values())
