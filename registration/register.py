@@ -5,6 +5,8 @@ Auden Woolfson, 2023
 import sys
 import re
 import pandas as pd
+import copy
+import random
 
 sys.path.append("../src")
 
@@ -107,6 +109,7 @@ def main():
             "214-1": 10840
             }
         
+        # filter courses that have already been taken
         pattern = "([0-9]{3})"
         taken = set()
         taken_entry = row[4]
@@ -119,6 +122,8 @@ def main():
             taken.add(number)
             
         can_take = set(map(lambda x: x[:3], crns.keys())) - (taken - {"495", "496"})
+        
+        # filter courses that have prereqs that haven't been taken
         to_remove = set()
         
         if "212" not in taken:
@@ -140,31 +145,34 @@ def main():
                     
             if "219" not in taken:
                 to_remove.add("315")
-            
-        # if len(to_remove.intersection(can_take)) > 0:
-        #     print(f"{row[1]} blocked from: {to_remove.intersection(can_take)}, only took: {taken}")
         
         can_take -= to_remove
         section_limit = 0
         
+        # create each students section ranking
         pattern = "([0-9]{3}-[0-9]{1})"
         ranking = []
         for i in list(range(6, 20)) + [25]:
             if type(row[i]) == str:
                 number = re.match(pattern, row[i])
                 number = number.group(1)
-                # if number[:3] == "212" and "212" in taken:
-                #     print(f"{row[1]}")
                 if number[:3] in can_take:
                     if crn := crns.get(number, None):
                         ranking.append(crn)
+                        
+                        # make sure students who want 212 get it due to low demand
                         if number[:3] == "212":
                             section_limit = 1
+                            
+        # make sure intended majors can have a course
+        if major == "intended":
+            section_limit = 1
             
         # tier 1: majors needs
         section_limit = min(courses_needed_soft, row[20], 4, len(ranking)) if major == "major" else section_limit
         remaining_seats -= section_limit
         
+        # initialize student object, kwargs will go into info field
         new_student = Student(
             id = "00" + str(row[2]), name=row[1], major=major, base_score=base_score,
             **{
@@ -172,18 +180,18 @@ def main():
                 "courses_needed_hard": courses_needed_hard,
                 "courses_desired": row[20],
                 "grad_semester": grad_semester,
-                "max_seats": min(4, len(ranking), row[20]),
+                "max_seats": min(max(3, courses_needed_hard) , len(ranking), row[20]),
                 "courses_taken": taken,
                 }
         )
 
+        # prepare student for matching algorithm
         new_student.set_section_ranking(ranking)
         new_student.section_limit = section_limit
-
         new_student.find_conflicts(sections)
-
         students[new_student.id] = new_student
 
+    # use tiered system to allocate remaining seats
     prev_remaining_seats = remaining_seats
     iteration = 0
     sorted_students = sorted(students.values(), key=lambda x: x.base_score, reverse=True)
@@ -258,14 +266,21 @@ def main():
         if student.major == "minor" and \
         student.info["grad_semester"] == "Spring 2024" and \
         student.info["courses_needed_hard"] == 1:
-            student.base_score += 1000
-                
-    gale_shapley_match(students, sections)
+            student.base_score += 2000 # same as majors
+            
+    # constant seed allows for deterministic pseudorandom results, seed 1 had best stats
+    seed = 1
+    gale_shapley_match(students, sections, shuffle=True, seed=seed)
     
+    students_with_zero = 0
+    for student in students.values():
+        if student.section_limit > 0 and len(student.enrolled_in) == 0:
+            students_with_zero += 1
+
     for section in sections.values():
         if len(section.roster_pq) < section.capacity:
             print(f"\n{section.course_name} has {section.capacity - len(section.roster_pq)} empty seats")
-    
+
     print(check_stability(students, sections))
 
     total_desired_seats = sum(map(lambda x: x.info["courses_desired"], students.values()))
@@ -277,6 +292,7 @@ def main():
     print(f"total allocated seats: {total_allocated_seats}")
     print(f"total filled seats: {total_filled_seats}")
     print(f"total seats: {total_seats}")
+    print(f"students with zero: {students_with_zero}")
 
     ids = list(students.keys())
     students_output = list(students.values())
