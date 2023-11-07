@@ -30,7 +30,7 @@ def gale_shapley_match(student_dict: dict,
             # try enrolling student in favorite section
             proposed_section = section_dict[cur_student.get_top_section_id()]
             cur_student.add_proposal(proposed_section.id)
-
+            
             if not proposed_section.is_full():
                 add_student_to_section(cur_student, proposed_section)
             elif (

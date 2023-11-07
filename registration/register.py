@@ -109,6 +109,7 @@ def main():
             "214-1": 10840
             }
         
+        # filter courses that have already been taken
         pattern = "([0-9]{3})"
         taken = set()
         taken_entry = row[4]
@@ -121,6 +122,8 @@ def main():
             taken.add(number)
             
         can_take = set(map(lambda x: x[:3], crns.keys())) - (taken - {"495", "496"})
+        
+        # filter courses that have prereqs that haven't been taken
         to_remove = set()
         
         if "212" not in taken:
@@ -142,13 +145,11 @@ def main():
                     
             if "219" not in taken:
                 to_remove.add("315")
-            
-        # if len(to_remove.intersection(can_take)) > 0:
-        #     print(f"{row[1]} blocked from: {to_remove.intersection(can_take)}, only took: {taken}")
         
         can_take -= to_remove
         section_limit = 0
         
+        # create each students section ranking
         pattern = "([0-9]{3}-[0-9]{1})"
         ranking = []
         for i in list(range(6, 20)) + [25]:
@@ -158,9 +159,12 @@ def main():
                 if number[:3] in can_take:
                     if crn := crns.get(number, None):
                         ranking.append(crn)
+                        
+                        # make sure students who want 212 get it due to low demand
                         if number[:3] == "212":
                             section_limit = 1
                             
+        # make sure intended majors can have a course
         if major == "intended":
             section_limit = 1
             
@@ -168,6 +172,7 @@ def main():
         section_limit = min(courses_needed_soft, row[20], 4, len(ranking)) if major == "major" else section_limit
         remaining_seats -= section_limit
         
+        # initialize student object, kwargs will go into info field
         new_student = Student(
             id = "00" + str(row[2]), name=row[1], major=major, base_score=base_score,
             **{
@@ -180,13 +185,13 @@ def main():
                 }
         )
 
+        # prepare student for matching algorithm
         new_student.set_section_ranking(ranking)
         new_student.section_limit = section_limit
-
         new_student.find_conflicts(sections)
-
         students[new_student.id] = new_student
 
+    # use tiered system to allocate remaining seats
     prev_remaining_seats = remaining_seats
     iteration = 0
     sorted_students = sorted(students.values(), key=lambda x: x.base_score, reverse=True)
@@ -256,43 +261,16 @@ def main():
         prev_remaining_seats = remaining_seats
         iteration += 1
         
-    # robotics_final_roster = {
-    #  'cmeza@conncoll.edu', 
-    #  'zwheat@conncoll.edu', 
-    #  'jasaro@conncoll.edu', 
-    #  'adobro@conncoll.edu', 
-    #  'jrondon@conncoll.edu', 
-    #  'ktipnis@conncoll.edu', 
-    #  'rkosovsky@conncoll.edu', 
-    #  'ylee5@conncoll.edu', 
-    #  'abolcerek@conncoll.edu', 
-    #  'pokai@conncoll.edu', 
-    #  'ztate@conncoll.edu', 
-    #  'faladin@conncoll.edu', 
-    #  'rchang@conncoll.edu', 
-    #  'qfurgueso@conncoll.edu', 
-    #  'mvolpi1@conncoll.edu', 
-    #  'wzhang4@conncoll.edu', 
-    #  'clincoln1@conncoll.edu', 
-    #  'mrenwicka@conncoll.edu', 
-    #  'ptsiali@conncoll.edu', 
-    #  'bbrandenb@conncoll.edu'
-    # }
-    # robotics_roster_info = {}
     # give those minors with one more course the needed boost
     for student in students.values():
         if student.major == "minor" and \
         student.info["grad_semester"] == "Spring 2024" and \
         student.info["courses_needed_hard"] == 1:
             student.base_score += 2000 # same as majors
-    #     if student.name in robotics_final_roster:
-    #         robotics_roster_info[student.id] = [student.name, student.base_score, student.section_ranking.index(10330)+1]
-    # robotics_roster_info = pd.DataFrame.from_dict(robotics_roster_info, orient='index', columns=['name', 'base_score', 'robotics_rank'])
-    # robotics_roster_info.to_csv("robotics_roster_info.csv")
             
+    # constant seed allows for deterministic pseudorandom results, seed 1 had best stats
     seed = 1
     gale_shapley_match(students, sections, shuffle=True, seed=seed)
-    print(seed)
     
     students_with_zero = 0
     for student in students.values():
