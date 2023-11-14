@@ -15,6 +15,8 @@ waitlist = pd.DataFrame(columns=[
     "Already Taken",
     "Has Overrides For",
     "Still Wants",
+    "Amount Awarded",
+    "Amount Still Wanted",
     "Notes"
 ])
 
@@ -28,11 +30,10 @@ for (index, form_row), (_, output_row) in zip(google_form.iterrows(), output_stu
     
     pattern = "\d{3}"
     student["Already Taken"] = re.findall(pattern, str(form_row[4]))
-    print(form_row[4])
     pattern = "\d{3}-\d"
     student["Has Overrides For"] = re.findall(pattern, str(output_row["enrolled_in_names"]))
     
-    if len(student["Has Overrides For"]) >= form_row[20]:
+    if len(student["Has Overrides For"]) >= form_row[22]:
         continue
     
     desired = set()
@@ -42,6 +43,9 @@ for (index, form_row), (_, output_row) in zip(google_form.iterrows(), output_stu
             desired.add(num[0])
         
     student["Still Wants"] = desired - set(student["Has Overrides For"])
+    
+    student["Amount Awarded"] = len(student["Has Overrides For"])
+    student["Amount Still Wanted"] = form_row[22] - student["Amount Awarded"]
     
     waitlist = waitlist.append(student, ignore_index=True)
 

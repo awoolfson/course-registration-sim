@@ -2,6 +2,7 @@ import heapq
 
 from student import Student
 from schedule import Schedule
+from typing import Callable
 
 class CourseSection:
     def __init__(
@@ -9,11 +10,12 @@ class CourseSection:
         id: int,
         code: str,
         capacity: int,
-        credits: int,
         dept: str,
-        name: str,
         times: list,
         days: list,
+        name: str = "UNNAMED",
+        credits: int = 4,
+        scoring_function: Callable[[Student], int] = lambda x: x.base_score,
     ):
         self.id = id  # 6 digit CRN
         self.capacity = capacity
@@ -29,6 +31,7 @@ class CourseSection:
         )  # this lets the algorithm know if a student was swapped out and which student
         self.student_section_scores = {}
         self.schedule = Schedule(times=times, days=days)
+        self.scoring_function = scoring_function
 
     def __str__(self):
         roster = []
@@ -45,7 +48,7 @@ class CourseSection:
         if id in self.student_section_scores:
             return self.student_section_scores[id]
         else:
-            return student.base_score
+            return self.scoring_function(student)
 
     def pop_lowest_student(self) -> Student:
         popped_student = heapq.heappop(self.roster_pq)

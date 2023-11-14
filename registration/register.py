@@ -7,6 +7,7 @@ import re
 import pandas as pd
 import copy
 import random
+import os
 
 sys.path.append("../src")
 
@@ -17,12 +18,36 @@ from test_stability import check_stability
 from student import Student
 
 def main():
-    sections = section_csv_to_dict("cs_courses_spring24.csv")
+    
+    dir = input("Enter the directory name (semester) of registration")
+    
+    try:
+        sys.path.append(f"../registration/{dir}")
+    except:
+        sys.path.append("../registration/")
+        ans = input(f"Directorty not found, would you like to initialize a new directory with name {dir}? (y/n)")
+        if ans == "y":
+            os.mkdir(f"../registration/{dir}")
+            sys.path.append(f"{dir}/")
+            os.mkdir("input")
+            os.mkdir("output")
+            
+            sys.path.append("input/")
+            os.touch("courses.csv")
+            os.touch("google_form_students.csv")
+            
+            sys.path.append("../output/")
+            os.mkdir("individual_sections")
+        else:
+            print("Exiting...")
+            return
+    
+    sections = section_csv_to_dict("input/courses.csv")
 
     total_seats = sum(map(lambda x: x.capacity, sections.values()))
     remaining_seats = total_seats
 
-    response_df =  pd.read_csv("google_form_students.csv")
+    response_df =  pd.read_csv("input/google_form_students.csv")
     students = {}
 
     for index, row in response_df.iterrows():
@@ -329,7 +354,7 @@ def main():
             "enrolled_in_names"
             ])
     
-    students_output.to_csv("output_students.csv")
+    students_output.to_csv("output/output_students.csv")
 
     crns = list(sections.keys())
     sections_output = list(sections.values())
@@ -343,12 +368,12 @@ def main():
         ))
     
     sections_output = pd.DataFrame(sections_output, index=crns, columns=["course_name", "num_enrolled", "roster"])
-    sections_output.to_csv("output_sections.csv")
+    sections_output.to_csv("output/output_sections.csv")
     
     writer = pd.ExcelWriter('overrides.xlsx', engine='xlsxwriter')
     for section in sections.values():
         roster = list(map(lambda x: x[1], section.roster_pq))
-        filepath = "individual_sections/" + section.course_code + ".csv"
+        filepath = "output/individual_sections/" + section.course_code + ".csv"
         section_output = students_output[students_output.index.isin(roster)]
         section_output.to_csv(filepath)
         section_output.to_excel(writer, sheet_name=section.course_code)

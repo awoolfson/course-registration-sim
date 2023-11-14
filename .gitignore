@@ -170,3 +170,5 @@ registration/individual_sections.zip
 registration/overrides.xlsx
 registration/with_shuffle.csv
 registration/final_output_students.csv
+registration/waitlist.csv
+registration/*/output/*
