@@ -19,29 +19,31 @@ from student import Student
 
 def main():
     
-    dir = input("Enter the directory name (semester) of registration")
+    dir = input("Enter the directory name (semester) of registration\n")
     
-    try:
-        sys.path.append(f"../registration/{dir}")
-    except:
-        sys.path.append("../registration/")
+    if os.path.isdir(f"../registration/{dir}"):
+        os.chdir(f"../registration/{dir}/")
+    else:
+        os.chdir("../registration/")
         ans = input(f"Directorty not found, would you like to initialize a new directory with name {dir}? (y/n)")
         if ans == "y":
             os.mkdir(f"../registration/{dir}")
-            sys.path.append(f"{dir}/")
+            os.chdir(f"{dir}/")
             os.mkdir("input")
             os.mkdir("output")
             
-            sys.path.append("input/")
-            os.touch("courses.csv")
-            os.touch("google_form_students.csv")
+            os.chdir("input/")
+            open(f"courses.csv", "w")
+            open(f"google_form_students.csv", "w")
             
-            sys.path.append("../output/")
+            os.chdir("../output/")
             os.mkdir("individual_sections")
+            os.chdir("../")
+            print("Directory initialized...\nExiting...")
         else:
             print("Exiting...")
             return
-    
+
     sections = section_csv_to_dict("input/courses.csv")
 
     total_seats = sum(map(lambda x: x.capacity, sections.values()))
@@ -370,7 +372,7 @@ def main():
     sections_output = pd.DataFrame(sections_output, index=crns, columns=["course_name", "num_enrolled", "roster"])
     sections_output.to_csv("output/output_sections.csv")
     
-    writer = pd.ExcelWriter('overrides.xlsx', engine='xlsxwriter')
+    writer = pd.ExcelWriter('output/overrides.xlsx', engine='xlsxwriter')
     for section in sections.values():
         roster = list(map(lambda x: x[1], section.roster_pq))
         filepath = "output/individual_sections/" + section.course_code + ".csv"
