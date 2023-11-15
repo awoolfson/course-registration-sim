@@ -21,13 +21,13 @@ def main():
     
     dir = input("Enter the directory name (semester) of registration\n")
     
-    if os.path.isdir(f"../registration/{dir}"):
-        os.chdir(f"../registration/{dir}/")
+    if os.path.isdir(f"../registration/semesters/{dir}"):
+        os.chdir(f"../registration/semesters/{dir}/")
     else:
-        os.chdir("../registration/")
+        os.chdir("../registration/semesters/")
         ans = input(f"Directorty not found, would you like to initialize a new directory with name {dir}? (y/n)")
         if ans == "y":
-            os.mkdir(f"../registration/{dir}")
+            os.mkdir(f"../registration/semesters/{dir}")
             os.chdir(f"{dir}/")
             os.mkdir("input")
             os.mkdir("output")
@@ -38,7 +38,7 @@ def main():
             
             os.chdir("../output/")
             os.mkdir("individual_sections")
-            os.chdir("../")
+            os.chdir("../../")
             print("Directory initialized...\nExiting...")
         else:
             print("Exiting...")

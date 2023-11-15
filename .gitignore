@@ -165,10 +165,9 @@ cython_debug/
 google_form_students.csv
 output_students.csv
 output_sections.csv
-registration/individual_sections/*
-registration/individual_sections.zip
-registration/overrides.xlsx
-registration/with_shuffle.csv
-registration/final_output_students.csv
-registration/waitlist.csv
-registration/*/output/*
+registration/semesters/*/individual_sections/*
+registration/semesters/*/individual_sections.zip
+registration/semesters/*/overrides.xlsx
+registration/semesters/*/final_output_students.csv
+registration/semesters/*/waitlist.csv
+registration/semesters/*
