@@ -9,6 +9,8 @@ import copy
 import random
 import os
 
+from get_semester_input import get_semester_input
+
 sys.path.append("../src")
 
 from data_methods import section_csv_to_dict
@@ -19,32 +21,11 @@ from student import Student
 
 def main():
     
-    dir = input("Enter the directory name (semester) of registration\n")
-    
-    if os.path.isdir(f"../registration/semesters/{dir}"):
-        os.chdir(f"../registration/semesters/{dir}/")
-    else:
-        os.chdir("../registration/semesters/")
-        ans = input(f"Directorty not found, would you like to initialize a new directory with name {dir}? (y/n)")
-        if ans == "y":
-            os.mkdir(f"../registration/semesters/{dir}")
-            os.chdir(f"{dir}/")
-            os.mkdir("input")
-            os.mkdir("output")
-            
-            os.chdir("input/")
-            open(f"courses.csv", "w")
-            open(f"google_form_students.csv", "w")
-            
-            os.chdir("../output/")
-            os.mkdir("individual_sections")
-            os.chdir("../../")
-            print("Directory initialized...\nExiting...")
-        else:
-            print("Exiting...")
-            return
+    get_semester_input()
 
     sections = section_csv_to_dict("input/courses.csv")
+    crns = dict(zip(map(lambda x: x.course_code, sections.values()), sections.keys()))
+    print(crns)
 
     total_seats = sum(map(lambda x: x.capacity, sections.values()))
     remaining_seats = total_seats
@@ -119,22 +100,6 @@ def main():
         
         courses_needed_soft = max(courses_needed_soft, 0)
         courses_needed_hard = max(courses_needed_hard, 0)
-        
-        crns = {
-            "212-1": 10324,
-            "212-2": 10325,
-            "219-1": 10746,
-            "302-1": 10326,
-            "303-1": 10327,
-            "304-1": 10328,
-            "310-1": 10330,
-            "313-1": 10331,
-            "315-1": 10332,
-            "428-1": 10813,
-            "496-1": 10334,
-            "496-2": 10335,
-            "214-1": 10840
-            }
         
         # filter courses that have already been taken
         pattern = "([0-9]{3})"
