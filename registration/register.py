@@ -5,8 +5,8 @@ Auden Woolfson, 2023
 import sys
 import re
 import pandas as pd
-import copy
-import random
+
+from get_semester_input import get_semester_input
 
 sys.path.append("../src")
 
@@ -17,12 +17,16 @@ from test_stability import check_stability
 from student import Student
 
 def main():
-    sections = section_csv_to_dict("cs_courses_spring24.csv")
+    
+    get_semester_input()
+
+    sections = section_csv_to_dict("input/courses.csv")
+    crns = dict(zip(map(lambda x: x.course_code, sections.values()), sections.keys()))
 
     total_seats = sum(map(lambda x: x.capacity, sections.values()))
     remaining_seats = total_seats
 
-    response_df =  pd.read_csv("google_form_students.csv")
+    response_df =  pd.read_csv("input/google_form_students.csv")
     students = {}
 
     for index, row in response_df.iterrows():
@@ -92,22 +96,6 @@ def main():
         
         courses_needed_soft = max(courses_needed_soft, 0)
         courses_needed_hard = max(courses_needed_hard, 0)
-        
-        crns = {
-            "212-1": 10324,
-            "212-2": 10325,
-            "219-1": 10746,
-            "302-1": 10326,
-            "303-1": 10327,
-            "304-1": 10328,
-            "310-1": 10330,
-            "313-1": 10331,
-            "315-1": 10332,
-            "428-1": 10813,
-            "496-1": 10334,
-            "496-2": 10335,
-            "214-1": 10840
-            }
         
         # filter courses that have already been taken
         pattern = "([0-9]{3})"
@@ -329,7 +317,7 @@ def main():
             "enrolled_in_names"
             ])
     
-    students_output.to_csv("output_students.csv")
+    students_output.to_csv("output/output_students.csv")
 
     crns = list(sections.keys())
     sections_output = list(sections.values())
@@ -343,12 +331,12 @@ def main():
         ))
     
     sections_output = pd.DataFrame(sections_output, index=crns, columns=["course_name", "num_enrolled", "roster"])
-    sections_output.to_csv("output_sections.csv")
+    sections_output.to_csv("output/output_sections.csv")
     
-    writer = pd.ExcelWriter('overrides.xlsx', engine='xlsxwriter')
+    writer = pd.ExcelWriter('output/overrides.xlsx', engine='xlsxwriter')
     for section in sections.values():
         roster = list(map(lambda x: x[1], section.roster_pq))
-        filepath = "individual_sections/" + section.course_code + ".csv"
+        filepath = "output/individual_sections/" + section.course_code + ".csv"
         section_output = students_output[students_output.index.isin(roster)]
         section_output.to_csv(filepath)
         section_output.to_excel(writer, sheet_name=section.course_code)
