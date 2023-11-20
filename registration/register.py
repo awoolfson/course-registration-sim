@@ -5,9 +5,6 @@ Auden Woolfson, 2023
 import sys
 import re
 import pandas as pd
-import copy
-import random
-import os
 
 from get_semester_input import get_semester_input
 
@@ -25,7 +22,6 @@ def main():
 
     sections = section_csv_to_dict("input/courses.csv")
     crns = dict(zip(map(lambda x: x.course_code, sections.values()), sections.keys()))
-    print(crns)
 
     total_seats = sum(map(lambda x: x.capacity, sections.values()))
     remaining_seats = total_seats
