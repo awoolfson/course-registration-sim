@@ -315,6 +315,9 @@ def main():
     print(f"total filled seats: {total_filled_seats}")
     print(f"total seats: {total_seats}")
     print(f"students with zero: {students_with_zero}")
+    print(f"students with first choice: {students_with_first_choice}")
+    print(f"current majors on track: {majors_on_track}/{majors}")
+    print(f"majors previously on track: {majors_previously_on_track}/{majors}")
 
     ids = list(students.keys())
     students_output = list(students.values())
