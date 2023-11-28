@@ -281,6 +281,23 @@ def main():
     # constant seed allows for deterministic pseudorandom results, seed 1 had best stats
     seed = 1
     gale_shapley_match(students, sections, shuffle=True, seed=seed)
+
+    students_with_first_choice = 0
+    for student in students.values():
+        if student.section_ranking and student.section_ranking[0] in student.enrolled_in:
+            students_with_first_choice += 1
+            
+    print(f"students with first choice: {students_with_first_choice}")
+    
+    students_on_track = 0
+    majors = 0
+    for student in students.values():
+        if student.major == "major":
+            if len(student.enrolled_in) >= student.info["courses_needed_soft"]:
+                students_on_track += 1
+            majors += 1
+            
+    print(f"majors on track: {students_on_track}/{majors}")
     
     students_with_zero = 0
     for student in students.values():
