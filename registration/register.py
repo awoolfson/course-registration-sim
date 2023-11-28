@@ -281,34 +281,29 @@ def main():
     # constant seed allows for deterministic pseudorandom results, seed 1 had best stats
     seed = 1
     gale_shapley_match(students, sections, shuffle=True, seed=seed)
+    
+    print(check_stability(students, sections))
 
     students_with_first_choice = 0
+    students_with_zero = 0
+    majors_on_track = 0
+    majors_previously_on_track = 0
+    majors = 0
     for student in students.values():
         if student.section_ranking and student.section_ranking[0] in student.enrolled_in:
             students_with_first_choice += 1
-            
-    print(f"students with first choice: {students_with_first_choice}")
-    
-    students_on_track = 0
-    majors = 0
-    for student in students.values():
         if student.major == "major":
-            if len(student.enrolled_in) >= student.info["courses_needed_soft"]:
-                students_on_track += 1
             majors += 1
-            
-    print(f"majors on track: {students_on_track}/{majors}")
-    
-    students_with_zero = 0
-    for student in students.values():
+            if len(student.enrolled_in) >= student.info["courses_needed_soft"]:
+                majors_on_track += 1
+            if student.info["courses_needed_soft"] <= 2:
+                majors_previously_on_track += 1
         if student.section_limit > 0 and len(student.enrolled_in) == 0:
             students_with_zero += 1
-
+            
     for section in sections.values():
         if len(section.roster_pq) < section.capacity:
             print(f"\n{section.course_name} has {section.capacity - len(section.roster_pq)} empty seats")
-
-    print(check_stability(students, sections))
 
     total_desired_seats = sum(map(lambda x: x.info["courses_desired"], students.values()))
     total_allocated_seats = sum(map(lambda x: x.section_limit, students.values()))
