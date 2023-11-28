@@ -127,8 +127,9 @@ def main():
         else:
             taken_entry = []
         for entry in taken_entry:
-            number = re.findall(pattern, entry)[0]
-            taken.add(number)
+            number = re.findall(pattern, entry)
+            if number:
+                taken.add(number[0])
             
         can_take = set(map(lambda x: x[:3], crns.keys())) - (taken - {"495", "496"})
         
