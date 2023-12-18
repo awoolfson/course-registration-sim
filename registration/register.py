@@ -300,7 +300,7 @@ def main():
                 majors_previously_on_track += 1
         if student.section_limit > 0 and len(student.enrolled_in) == 0:
             students_with_zero += 1
-            
+
     for section in sections.values():
         if len(section.roster_pq) < section.capacity:
             print(f"\n{section.course_name} has {section.capacity - len(section.roster_pq)} empty seats")
