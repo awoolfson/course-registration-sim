@@ -28,29 +28,50 @@ def main():
 
     response_df =  pd.read_csv("input/google_form_students.csv")
     students = {}
+    
+    row_keys = {
+        "1": "camel_number",
+        "2": "status",
+        "3": "taken_courses",
+        "4": "grad_semester",
+        "5": "desired_courses",
+        "6": "desired_amount",
+        "7": "percieved_need",
+        "8": "understanding",
+        "9": "comments",
+    }
+    
+    for column in response_df.columns:
+        if column[0] in row_keys:
+            response_df = response_df.rename(columns={column: row_keys[column[0]]})
+            
+    desired_columns = set()
+    for i in range(len(response_df.columns)):
+        if response_df.columns[i] == "desired_courses":
+            desired_columns.add(i)
 
     for index, row in response_df.iterrows():
         
         base_score = 0
         
-        taken_courses = row[4]
+        taken_courses = row["taken_courses"]
         if type(taken_courses) == str:
             taken_courses = taken_courses.split(",")
         else:
             taken_courses = []
         taken_count = len(taken_courses)
-        status = row[3]
+        status_response = row["status"]
         
         # base score heavily based on major status
-        if status == "declared CS major":
+        if status_response[0] == "1":
             base_score = 3000
             courses_left = 12 - taken_count
             major = "major"
-        elif status == "intended CS major":
+        elif status_response[0] == "2":
             base_score = 2000
             courses_left = 12 - taken_count
             major = "intended"
-        elif status == "CS minor":
+        elif status_response[0] == "3":
             base_score = 1000
             courses_left = 5 - taken_count
             major = "minor"
@@ -60,36 +81,36 @@ def main():
             major = "none"
         
         # modifiers to base score applied based on seniority
-        grad_semester = row[5]
-        if grad_semester == "Spring 2024":
+        grad_semester_response = row["grad_semester"]
+        if grad_semester_response[0] == "1":
             courses_needed_soft = courses_left
             courses_needed_hard = courses_left
             base_score += 80
-        elif grad_semester == "Fall 2024":
+        elif grad_semester_response[0] == "2":
             courses_needed_soft = courses_left - 2
             courses_needed_hard = courses_left - 4
             base_score += 70
-        elif grad_semester == "Spring 2025":
+        elif grad_semester_response[0] == "3":
             courses_needed_soft = courses_left - 4
             courses_needed_hard = courses_left - 8
             base_score += 60
-        elif grad_semester == "Fall 2025":
+        elif grad_semester_response[0] == "4":
             courses_needed_soft = courses_left - 6
             courses_needed_hard = courses_left - 12
             base_score += 50
-        elif grad_semester == "Spring 2026":
+        elif grad_semester_response[0] == "5":
             courses_needed_soft = courses_left - 8
             courses_needed_hard = courses_left - 16
             base_score += 40
-        elif grad_semester == "Fall 2026":
+        elif grad_semester_response[0] == "6":
             courses_needed_soft = courses_left - 10
             courses_needed_hard = courses_left - 20
             base_score += 30
-        elif grad_semester == "Spring 2027":
+        elif grad_semester_response[0] == "7":
             courses_needed_soft = courses_left - 12
             courses_needed_hard = courses_left - 24
             base_score += 20
-        elif grad_semester == "Fall 2027":
+        elif grad_semester_response[0] == "8":
             courses_needed_soft = courses_left - 14
             courses_needed_hard = courses_left - 28
             base_score += 10
@@ -106,8 +127,9 @@ def main():
         else:
             taken_entry = []
         for entry in taken_entry:
-            number = re.findall(pattern, entry)[0]
-            taken.add(number)
+            number = re.findall(pattern, entry)
+            if number:
+                taken.add(number[0])
             
         can_take = set(map(lambda x: x[:3], crns.keys())) - (taken - {"495", "496"})
         
@@ -140,7 +162,7 @@ def main():
         # create each students section ranking
         pattern = "([0-9]{3}-[0-9]{1})"
         ranking = []
-        for i in list(range(6, 20)) + [25]:
+        for i in desired_columns:
             if type(row[i]) == str:
                 number = re.match(pattern, row[i])
                 number = number.group(1)
@@ -167,7 +189,7 @@ def main():
                 "courses_needed_soft": courses_needed_soft,
                 "courses_needed_hard": courses_needed_hard,
                 "courses_desired": row[20],
-                "grad_semester": grad_semester,
+                "grad_semester": grad_semester_response,
                 "max_seats": min(max(3, courses_needed_hard) , len(ranking), row[20]),
                 "courses_taken": taken,
                 }
@@ -278,7 +300,7 @@ def main():
                 majors_previously_on_track += 1
         if student.section_limit > 0 and len(student.enrolled_in) == 0:
             students_with_zero += 1
-    
+
     for section in sections.values():
         if len(section.roster_pq) < section.capacity:
             print(f"\n{section.course_name} has {section.capacity - len(section.roster_pq)} empty seats")
